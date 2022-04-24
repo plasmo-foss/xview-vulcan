@@ -23,7 +23,7 @@ const MainContainer = styled.main`
 const Home: NextPage = () => {
   return (
     <MainContainer>
-      <Heading>No War PLS</Heading>
+      <Heading>NO WAR PLS!</Heading>
     </MainContainer>
   )
 }
