@@ -5,6 +5,7 @@ specifiers:
   '@danmarshall/deckgl-typings': 4.9.22
   '@deck.gl/core': 8.7.8
   '@deck.gl/layers': 8.7.8
+  '@deck.gl/mapbox': 8.7.8
   '@deck.gl/mesh-layers': 8.7.8
   '@deck.gl/react': 8.7.8
   '@emotion/react': 11.9.0
@@ -18,7 +19,9 @@ specifiers:
   '@luma.gl/gltools': 8.5.10
   '@luma.gl/shadertools': 8.5.10
   '@luma.gl/webgl': 8.5.10
+  '@mapbox/mapbox-gl-draw': 1.3.0
   '@trivago/prettier-plugin-sort-imports': 3.2.0
+  '@types/mapbox__mapbox-gl-draw': 1.2.3
   '@types/node': 17.0.25
   '@types/react': 18.0.6
   '@types/react-dom': 18.0.2
@@ -28,6 +31,7 @@ specifiers:
   gl-matrix: 3.4.3
   iconoir-react: 4.9.1
   mapbox-gl: 2.8.2
+  mapbox-gl-draw-rectangle-mode: 1.0.4
   next: 12.1.5
   next-seo: 5.4.0
   polished: 4.2.2
@@ -40,6 +44,7 @@ specifiers:
 dependencies:
   '@deck.gl/core': 8.7.8
   '@deck.gl/layers': 8.7.8_ae8dadc228fcd5dbe0a14d780e69ade7
+  '@deck.gl/mapbox': 8.7.8_@deck.gl+core@8.7.8
   '@deck.gl/mesh-layers': 8.7.8_4b421c9f2198d40a36650fde56cea373
   '@deck.gl/react': 8.7.8_cd66c23edc6962daf787f0baa60b6e4a
   '@emotion/react': 11.9.0_e7c53be29d0cf33e05dfabbe0af5a24f
@@ -53,10 +58,12 @@ dependencies:
   '@luma.gl/gltools': 8.5.10
   '@luma.gl/shadertools': 8.5.10
   '@luma.gl/webgl': 8.5.10
+  '@mapbox/mapbox-gl-draw': 1.3.0
   deck.gl: 8.7.8_eeb0e2a6255249f038b2c48881a1ff5c
   gl-matrix: 3.4.3
   iconoir-react: 4.9.1_react@18.0.0
   mapbox-gl: 2.8.2
+  mapbox-gl-draw-rectangle-mode: 1.0.4
   next: 12.1.5_cba0cb7a45c5be1acc73e969c348db7f
   next-seo: 5.4.0_1cf2cc49e2c27648b440cc4e09213966
   polished: 4.2.2
@@ -68,6 +75,7 @@ devDependencies:
   '@babel/core': 7.17.9
   '@danmarshall/deckgl-typings': 4.9.22
   '@trivago/prettier-plugin-sort-imports': 3.2.0_prettier@2.6.2
+  '@types/mapbox__mapbox-gl-draw': 1.2.3
   '@types/node': 17.0.25
   '@types/react': 18.0.6
   '@types/react-dom': 18.0.2
@@ -930,6 +938,38 @@ packages:
       probe.gl: 3.5.0
     dev: false
 
+  /@mapbox/extent/0.4.0:
+    resolution: {integrity: sha1-PlkfMuHww5gchkI597CsBuYQ+Kk=}
+    dev: false
+
+  /@mapbox/geojson-area/0.2.2:
+    resolution: {integrity: sha1-GNeBSqNr8j+7zDefjiaiKSfevxA=}
+    dependencies:
+      wgs84: 0.0.0
+    dev: false
+
+  /@mapbox/geojson-coords/0.0.2:
+    resolution: {integrity: sha512-YuVzpseee/P1T5BWyeVVPppyfmuXYHFwZHmybkqaMfu4BWlOf2cmMGKj2Rr92MwfSTOCSUA0PAsVGRG8akY0rg==}
+    dependencies:
+      '@mapbox/geojson-normalize': 0.0.1
+      geojson-flatten: 1.0.4
+    dev: false
+
+  /@mapbox/geojson-extent/1.0.1:
+    resolution: {integrity: sha512-hh8LEO3djT4fqfr8sSC6wKt+p0TMiu+KOLMBUiFOyj+zGq7+IXwQGl0ppCVDkyzCewyd9LoGe9zAvDxXrLfhLw==}
+    hasBin: true
+    dependencies:
+      '@mapbox/extent': 0.4.0
+      '@mapbox/geojson-coords': 0.0.2
+      rw: 0.1.4
+      traverse: 0.6.6
+    dev: false
+
+  /@mapbox/geojson-normalize/0.0.1:
+    resolution: {integrity: sha1-HaHms6et060pkJsw9Dj2BYG3zYA=}
+    hasBin: true
+    dev: false
+
   /@mapbox/geojson-rewind/0.5.1:
     resolution: {integrity: sha512-eL7fMmfTBKjrb+VFHXCGv9Ot0zc3C0U+CwXo1IrP+EPwDczLoXv34Tgq3y+2mPSFNVUXgU42ILWJTC7145KPTA==}
     hasBin: true
@@ -945,6 +985,18 @@ packages:
   /@mapbox/jsonlint-lines-primitives/2.0.2:
     resolution: {integrity: sha1-zlblOfg1UrWNENZy6k1vya3HsjQ=}
     engines: {node: '>= 0.6'}
+    dev: false
+
+  /@mapbox/mapbox-gl-draw/1.3.0:
+    resolution: {integrity: sha512-B+KWK+dAgzLHMNyKVuuMRfjeSlQ77MhNLdfpQQpbp3pkhnrdmydDe3ixto1Ua78hktNut0WTrAaD8gYu4PVcjA==}
+    dependencies:
+      '@mapbox/geojson-area': 0.2.2
+      '@mapbox/geojson-extent': 1.0.1
+      '@mapbox/geojson-normalize': 0.0.1
+      '@mapbox/point-geometry': 0.1.0
+      hat: 0.0.3
+      lodash.isequal: 4.5.0
+      xtend: 4.0.2
     dev: false
 
   /@mapbox/mapbox-gl-supported/2.0.1:
@@ -1199,7 +1251,6 @@ packages:
 
   /@types/geojson/7946.0.8:
     resolution: {integrity: sha512-1rkryxURpr6aWP7R786/UQOkJ3PcpQiWkAXBmdWc7ryFWqN6a4xfK7BtjXvFBKO9LjQ+MWQSWxYeZX1OApnArA==}
-    dev: false
 
   /@types/hammerjs/2.0.41:
     resolution: {integrity: sha512-ewXv/ceBaJprikMcxCmWU1FKyMAQ2X7a9Gtmzw8fcg2kIePI1crERDM818W+XYrxqdBBOdlf2rm137bU+BltCA==}
@@ -1213,7 +1264,13 @@ packages:
     resolution: {integrity: sha512-kNT3iHMZILCb5Kg07TaUnZglCucO9KbVy1/0uPkFs3G9fWyFz22PGlHJtd25+A6KZ2Sjl+ByXq5850jyeZWQBA==}
     dependencies:
       '@types/geojson': 7946.0.8
-    dev: false
+
+  /@types/mapbox__mapbox-gl-draw/1.2.3:
+    resolution: {integrity: sha512-S4Pm3w19S8mduiPgoeSt1UQ4BoqrObJtQRQpkD21hGHb6VsRy3VrD7ZCoC7/r5zwnjsGXhbUqy3lg1mGcI6QzQ==}
+    dependencies:
+      '@types/geojson': 7946.0.8
+      '@types/mapbox-gl': 2.7.0
+    dev: true
 
   /@types/node/17.0.25:
     resolution: {integrity: sha512-wANk6fBrUwdpY4isjWrKTufkrXdu1D2YHCot2fD/DfWxF5sMrVSA+KN7ydckvaTCh0HiqX9IVl0L5/ZoXg5M7w==}
@@ -2123,6 +2180,14 @@ packages:
     engines: {node: '>=6.9.0'}
     dev: true
 
+  /geojson-flatten/1.0.4:
+    resolution: {integrity: sha512-PpscUXxO6dvvhZxtwuqiI5v+1C/IQYPJRMWoQeaF2oohJgfGYSHKVAe8L+yUqF34PH/hmq9JlwmO+juPw+95/Q==}
+    hasBin: true
+    dependencies:
+      get-stdin: 7.0.0
+      minimist: 1.2.6
+    dev: false
+
   /geojson-vt/3.2.1:
     resolution: {integrity: sha512-EvGQQi/zPrDA6zr6BnJD/YhwAkBP8nnJ9emh3EnHQKVMfg/MRVtPbMYdgVy/IaEmn4UfagD2a6fafPDL5hbtwg==}
     dev: false
@@ -2134,6 +2199,11 @@ packages:
       has: 1.0.3
       has-symbols: 1.0.3
     dev: true
+
+  /get-stdin/7.0.0:
+    resolution: {integrity: sha512-zRKcywvrXlXsA0v0i9Io4KDRaAw7+a1ZpjRwl9Wox8PFlVCCHra7E9c4kqXCoCM9nR5tBkaTTZRBoCm60bFqTQ==}
+    engines: {node: '>=8'}
+    dev: false
 
   /get-stream/6.0.1:
     resolution: {integrity: sha512-ts6Wi+2j3jQjqi70w5AlN8DFnkSwC+MqmxEzdEALB2qXZYV3X/b1CTfgPLGJNMeAWxdPfU8FO1ms3NUfaHCPYg==}
@@ -2270,6 +2340,10 @@ packages:
     engines: {node: '>= 0.4.0'}
     dependencies:
       function-bind: 1.1.1
+
+  /hat/0.0.3:
+    resolution: {integrity: sha1-uwFKnmSzeIrtgAWRdBPU/z1QLYo=}
+    dev: false
 
   /hoist-non-react-statics/3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
@@ -2555,6 +2629,10 @@ packages:
       path-exists: 3.0.0
     dev: true
 
+  /lodash.isequal/4.5.0:
+    resolution: {integrity: sha1-QVxEePK8wwEgwizhDtMib30+GOA=}
+    dev: false
+
   /lodash.merge/4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
     dev: true
@@ -2580,6 +2658,10 @@ packages:
     dependencies:
       yallist: 4.0.0
     dev: true
+
+  /mapbox-gl-draw-rectangle-mode/1.0.4:
+    resolution: {integrity: sha512-BdF6nwEK2p8n9LQoMPzBO8LhddW1fe+d5vK8HQIei+4VcRnUbKNsEj7Z15FsJxCHzsc2BQKXbESx5GaE8x0imQ==}
+    dev: false
 
   /mapbox-gl/2.8.2:
     resolution: {integrity: sha512-73TgEQlh15TF1UeYhej9Tz1iU4ZhuxIwM6t+e6MxaA7Mu9vqUCZc1kZtZRAXrVeMcDHBSO6gUUjeDBOnsUZVmQ==}
@@ -3042,6 +3124,10 @@ packages:
       queue-microtask: 1.2.3
     dev: true
 
+  /rw/0.1.4:
+    resolution: {integrity: sha1-SQPL2AJIrg7eaFv1j9I2p6mymj4=}
+    dev: false
+
   /rw/1.3.3:
     resolution: {integrity: sha1-P4Yt+pGrdmsUiF700BEkv9oHT7Q=}
     dev: false
@@ -3225,6 +3311,10 @@ packages:
       is-number: 7.0.0
     dev: true
 
+  /traverse/0.6.6:
+    resolution: {integrity: sha1-y99WD9e5r2MlAv7UD5GMFX6pcTc=}
+    dev: false
+
   /tsconfig-paths/3.14.1:
     resolution: {integrity: sha512-fxDhWnFSLt3VuTwtvJt5fpwxBHg5AdKWMsgcPOOIilyjymcYVZoCQF8fvFRezCNfblEXmi+PcM1eYHeOAgXCOQ==}
     dependencies:
@@ -3298,6 +3388,10 @@ packages:
       pbf: 3.2.1
     dev: false
 
+  /wgs84/0.0.0:
+    resolution: {integrity: sha1-NP3FVZF7blfPKigu0ENxDASc3HY=}
+    dev: false
+
   /which-boxed-primitive/1.0.2:
     resolution: {integrity: sha512-bwZdv0AKLpplFY2KZRX6TvyuN7ojjr7lwkg6ml0roIy9YeuSr7JS372qlNW18UQYzgYK9ziGcerWqZOmEn9VNg==}
     dependencies:
@@ -3324,6 +3418,11 @@ packages:
   /wrappy/1.0.2:
     resolution: {integrity: sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=}
     dev: true
+
+  /xtend/4.0.2:
+    resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
+    engines: {node: '>=0.4'}
+    dev: false
 
   /yallist/4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}

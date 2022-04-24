@@ -9,7 +9,7 @@ export const TWITTER_HANDLE = "@nowarpls"
 
 export const SEO: NextSeoProps = {
   titleTemplate: `${COMPANY_NAME} | %s`,
-  title: `Iterate on every push`,
+  title: `No War Pls.`,
   description: "No War Please.",
   additionalMetaTags: [
     {
