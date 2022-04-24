@@ -70,6 +70,8 @@ export const GlobalStyle = () => (
     }
 
     #__next {
+      height: 100vh;
+      overflow: hidden;
     }
 
     * {
