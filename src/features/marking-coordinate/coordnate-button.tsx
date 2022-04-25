@@ -3,6 +3,7 @@ import { rgba } from "polished"
 
 export const GetCoordinateButton = styled.button<{
   active?: boolean
+  top?: number
 }>`
   background: ${(p) =>
     p.active ? p.theme.colors.secondary : p.theme.colors.white};
@@ -16,7 +17,7 @@ export const GetCoordinateButton = styled.button<{
 
   border-radius: 100%;
   position: absolute;
-  top: 22px;
+  top: ${(p) => p.top || 22}px;
   right: 22px;
 
   transition: 0.2s ease-in-out;
@@ -33,7 +34,6 @@ export const GetCoordinateButton = styled.button<{
 `
 
 export const SendCoordinateButton = styled(GetCoordinateButton)`
-  top: 80px;
   background: ${(p) =>
     p.disabled ? p.theme.colors.gray : p.theme.colors.darkPrimary};
   color: ${(p) => p.theme.colors.white};

@@ -1,6 +1,11 @@
 import { Layer as GenericLayer } from "@deck.gl/core"
 import DeckGL from "@deck.gl/react"
-import { Suggestion, Svg3DRectThreePts } from "iconoir-react"
+import {
+  KeyframeAlignVertical,
+  RemoveKeyframeAlt,
+  Suggestion,
+  Svg3DRectThreePts
+} from "iconoir-react"
 import "mapbox-gl/dist/mapbox-gl.css"
 import type { NextPage } from "next"
 import { useState } from "react"
@@ -17,6 +22,10 @@ import {
   MarkCoordinateProvider,
   useMarkCoordinate
 } from "~features/marking-coordinate/mark-coordinate"
+import {
+  TimeSlider,
+  ToggleSliderButton
+} from "~features/view-damage/time-slider"
 
 const INITIAL_VIEW_STATE = {
   longitude: -122.41669,
@@ -32,6 +41,8 @@ const Main = () => {
   const [staticLayers, setStaticLayers] = useState<
     Array<GenericLayer<any, any>>
   >([])
+
+  const [showSlider, setShowSlider] = useState(true)
 
   return (
     <MainContainer>
@@ -67,6 +78,18 @@ const Main = () => {
           <StartAndEndMarkers />
         </Map>
       </DeckGL>
+
+      {showSlider && <TimeSlider />}
+
+      <ToggleSliderButton
+        title="Toggle Slider"
+        active={showSlider}
+        onClick={() => {
+          setShowSlider(!showSlider)
+        }}>
+        {showSlider ? <RemoveKeyframeAlt /> : <KeyframeAlignVertical />}
+      </ToggleSliderButton>
+
       <GetCoordinateButton
         title="Get Coordinate"
         active={gettingCoordinate}
@@ -78,6 +101,7 @@ const Main = () => {
       </GetCoordinateButton>
 
       <SendCoordinateButton
+        top={80}
         title="Mark for ML Assessment Queue"
         disabled={!readyToSend}>
         <Suggestion />
