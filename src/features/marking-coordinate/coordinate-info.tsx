@@ -50,9 +50,9 @@ export const CoordinateInfo = () => {
       {endPos && (
         <CoordinateGroup>
           <div>
-            {endPos[0]}
+            {endPos[0].toFixed(6)}
             <b>- LNG </b> <br />
-            {endPos[1]}
+            {endPos[1].toFixed(6)}
             <b>- LAT</b>
           </div>
           <h3>
@@ -63,9 +63,9 @@ export const CoordinateInfo = () => {
       {startPos && (
         <CoordinateGroup>
           <div>
-            {startPos[0]}
+            {startPos[0].toFixed(6)}
             <b>- LNG </b> <br />
-            {startPos[1]}
+            {startPos[1].toFixed(6)}
             <b>- LAT</b>
           </div>
           <h3>
@@ -76,9 +76,9 @@ export const CoordinateInfo = () => {
 
       <CoordinateGroup>
         <div>
-          {cursorPos && cursorPos[0]}
+          {cursorPos && cursorPos[0].toFixed(6)}
           <b>- LNG </b> <br />
-          {cursorPos && cursorPos[1]}
+          {cursorPos && cursorPos[1].toFixed(6)}
           <b>- LAT</b>
         </div>
         <h3>
