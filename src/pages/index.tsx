@@ -1,17 +1,25 @@
 import { Layer as GenericLayer, Position } from "@deck.gl/core"
 import { ExtentsLeftBottomRightTop } from "@deck.gl/core/utils/positions"
-import { LineLayer, SolidPolygonLayer } from "@deck.gl/layers"
+import { LineLayer, PolygonLayer } from "@deck.gl/layers"
 import DeckGL from "@deck.gl/react"
 import { useTheme } from "@emotion/react"
-import { Svg3DRectThreePts, TriangleFlagFull } from "iconoir-react"
+import {
+  AddPinAlt,
+  CursorPointer,
+  MinusPinAlt,
+  Suggestion,
+  Svg3DRectThreePts
+} from "iconoir-react"
+import "mapbox-gl/dist/mapbox-gl.css"
 import type { NextPage } from "next"
 import { useMemo, useState } from "react"
-import { Map } from "react-map-gl"
+import { Map, Marker } from "react-map-gl"
 
+import { CoordinateGroup, CoordinateInfo } from "~components/coordinate-info"
 import {
   GetCoordinateButton,
   SendCoordinateButton
-} from "~components/get-coordnate-button"
+} from "~components/coordnate-button"
 import { MainContainer } from "~components/main-container"
 
 const INITIAL_VIEW_STATE = {
@@ -29,13 +37,14 @@ const IndexPage: NextPage = () => {
     null
   )
 
-  const [polygonLayer, setPolygonLayer] = useState<SolidPolygonLayer<any>>(null)
+  const [polygonLayer, setPolygonLayer] = useState<PolygonLayer<any>>(null)
 
   const [staticLayers, setStaticLayers] = useState<
     Array<GenericLayer<any, any>>
   >([])
-  const [leftTop, setLeftTop] = useState<Position>()
-  const [rightBottom, setRightBottom] = useState<Position>()
+  const [cursorPos, setCursorPos] = useState<Position>()
+  const [startPos, setStartPos] = useState<Position>()
+  const [endPos, setEndPos] = useState<Position>()
 
   const [boundary, setBoundary] = useState<ExtentsLeftBottomRightTop>()
 
@@ -49,14 +58,14 @@ const IndexPage: NextPage = () => {
   return (
     <MainContainer>
       <DeckGL
-        getTooltip={(o) => {
-          if (o.coordinate) {
-            return (
-              `LNG: ${o.coordinate[0]}\n LAT: ${o.coordinate[1]}` +
-              (readyToSend ? "\nRemove Selection" : "")
-            )
-          }
-        }}
+        // getTooltip={(o) => {
+        //   if (o.coordinate) {
+        //     return (
+        //       `LNG: ${o.coordinate[0]}\n LAT: ${o.coordinate[1]}` +
+        //       (readyToSend ? "\nRemove Selection" : "")
+        //     )
+        //   }
+        // }}
         layers={[...staticLayers, polygonLayer, lineLayer]}
         getCursor={(s) => {
           return gettingCoordinate
@@ -72,41 +81,42 @@ const IndexPage: NextPage = () => {
 
           if (!!boundary) {
             setBoundary(undefined)
-            setLeftTop(undefined)
-            setRightBottom(undefined)
+            setStartPos(undefined)
+            setEndPos(undefined)
             setLineLayer(null)
             return
           }
 
-          if (!!leftTop && !!rightBottom) {
-            const [left, top] = leftTop
-            const [right, bottom] = rightBottom
+          if (!!startPos && !!endPos) {
+            const [left, top] = startPos
+            const [right, bottom] = endPos
             setBoundary([left, bottom, right, top])
             return
           }
 
-          setLeftTop(e.coordinate)
+          setStartPos(e.coordinate)
         }}
         onHover={(e) => {
-          if (!gettingCoordinate || !leftTop || !!boundary || !e.coordinate) {
+          setCursorPos(e.coordinate)
+          if (!gettingCoordinate || !startPos || !!boundary || !e.coordinate) {
             return
           }
 
-          setRightBottom(e.coordinate)
+          setEndPos(e.coordinate)
 
-          const [left, top] = leftTop
+          const [startLon, startLat] = startPos
 
-          const [right, bottom] = e.coordinate
+          const [endLon, endLat] = e.coordinate
 
           setPolygonLayer(
-            new SolidPolygonLayer({
+            new PolygonLayer({
               data: {
                 points: [
-                  [left, top],
-                  [right, top],
-                  [right, bottom],
-                  [left, bottom],
-                  [left, top]
+                  [startLon, startLat],
+                  [endLon, startLat],
+                  [endLon, endLat],
+                  [startLon, endLat],
+                  [startLon, startLat]
                 ]
               },
               getFillColor: [0, 100, 60, 160],
@@ -121,20 +131,20 @@ const IndexPage: NextPage = () => {
               getWidth: 2,
               data: [
                 {
-                  sourcePosition: [left, top],
-                  targetPosition: [right, top]
+                  sourcePosition: [startLon, startLat],
+                  targetPosition: [endLon, startLat]
                 },
                 {
-                  sourcePosition: [right, top],
-                  targetPosition: [right, bottom]
+                  sourcePosition: [endLon, startLat],
+                  targetPosition: [endLon, endLat]
                 },
                 {
-                  sourcePosition: [right, bottom],
-                  targetPosition: [left, bottom]
+                  sourcePosition: [endLon, endLat],
+                  targetPosition: [startLon, endLat]
                 },
                 {
-                  sourcePosition: [left, bottom],
-                  targetPosition: [left, top]
+                  sourcePosition: [startLon, endLat],
+                  targetPosition: [startLon, startLat]
                 }
               ] as any
             })
@@ -143,9 +153,26 @@ const IndexPage: NextPage = () => {
         controller={!gettingCoordinate}
         initialViewState={INITIAL_VIEW_STATE}>
         <Map
+          customAttribution={`❤️☮️🤚 | www.plasmo.com`}
           mapStyle="mapbox://styles/mapbox/streets-v9"
-          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_KEY}
-        />
+          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_KEY}>
+          {startPos && (
+            <Marker
+              longitude={startPos[0]}
+              latitude={startPos[1]}
+              anchor="bottom">
+              <AddPinAlt />
+            </Marker>
+          )}
+          {endPos && (
+            <Marker
+              longitude={endPos[0]}
+              latitude={endPos[1]}
+              anchor="top-left">
+              <MinusPinAlt />
+            </Marker>
+          )}
+        </Map>
       </DeckGL>
       <GetCoordinateButton
         active={gettingCoordinate}
@@ -159,9 +186,50 @@ const IndexPage: NextPage = () => {
         <SendCoordinateButton
           title="Mark for ML Assessment Queue"
           disabled={!readyToSend}>
-          <TriangleFlagFull />
+          <Suggestion />
         </SendCoordinateButton>
       )}
+
+      <CoordinateInfo>
+        {endPos && (
+          <CoordinateGroup>
+            <div>
+              {endPos[0]}
+              <b>- LNG </b> <br />
+              {endPos[1]}
+              <b>- LAT</b>
+            </div>
+            <h3>
+              <MinusPinAlt />
+            </h3>
+          </CoordinateGroup>
+        )}
+        {startPos && (
+          <CoordinateGroup>
+            <div>
+              {startPos[0]}
+              <b>- LNG </b> <br />
+              {startPos[1]}
+              <b>- LAT</b>
+            </div>
+            <h3>
+              <AddPinAlt />
+            </h3>
+          </CoordinateGroup>
+        )}
+
+        <CoordinateGroup>
+          <div>
+            {cursorPos && cursorPos[0]}
+            <b>- LNG </b> <br />
+            {cursorPos && cursorPos[1]}
+            <b>- LAT</b>
+          </div>
+          <h3>
+            <CursorPointer />
+          </h3>
+        </CoordinateGroup>
+      </CoordinateInfo>
     </MainContainer>
   )
 }

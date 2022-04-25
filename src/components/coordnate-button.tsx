@@ -1,4 +1,5 @@
 import styled from "@emotion/styled"
+import { rgba } from "polished"
 
 export const GetCoordinateButton = styled.button<{
   active?: boolean
@@ -21,7 +22,8 @@ export const GetCoordinateButton = styled.button<{
   transition: 0.2s ease-in-out;
 
   &:hover {
-    background: ${(p) => p.theme.colors.primary};
+    background: ${(p) =>
+      p.active ? p.theme.colors.primary : rgba(p.theme.colors.gray, 0.8)};
     color: ${(p) => p.theme.colors.white};
   }
 
