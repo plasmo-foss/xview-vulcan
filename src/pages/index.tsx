@@ -72,7 +72,7 @@ const Main = () => {
         }}
         controller={!gettingCoordinate}>
         <Map
-          customAttribution={`❤️☮️🤚 | www.plasmo.com`}
+          customAttribution={`❤️☮️🤚 | www.plasmo.com | xView |`}
           mapStyle="mapbox://styles/mapbox/streets-v9"
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_KEY}>
           <StartAndEndMarkers />

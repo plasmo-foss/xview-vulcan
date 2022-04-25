@@ -25,7 +25,7 @@ declare module "@emotion/react" {
   export interface Theme extends XViewTheme {}
 }
 
-export const XViewTheme = ({ children = null as ReactNode }) => (
+export const VulcanXViewTheme = ({ children = null as ReactNode }) => (
   <ThemeProvider theme={theme}>
     <GlobalStyle />
     {children}
