@@ -4,13 +4,13 @@ import Head from "next/head"
 
 export const DOMAIN = "nowarpls.org"
 
-export const COMPANY_NAME = "nwp"
+export const COMPANY_NAME = "🕊️"
 export const TWITTER_HANDLE = "@nowarpls"
 
 export const SEO: NextSeoProps = {
   titleTemplate: `${COMPANY_NAME} | %s`,
-  title: `No War Pls.`,
-  description: "No War Please.",
+  title: `No War PLS.`,
+  description: "No War PLS.",
   additionalMetaTags: [
     {
       name: "keywords",
