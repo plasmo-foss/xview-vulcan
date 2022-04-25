@@ -2,17 +2,17 @@ import { NextSeo } from "next-seo"
 import type { AppProps } from "next/app"
 
 import { FavIcon, SEO } from "~core/seo"
-import { GlobalStyle, NoWarTheme } from "~core/theme"
+import { GlobalStyle, XViewTheme } from "~core/theme"
 
-function NoWarApp({ Component, pageProps }: AppProps) {
+function XViewUIApp({ Component, pageProps }: AppProps) {
   return (
-    <NoWarTheme>
+    <XViewTheme>
       <NextSeo {...SEO} />
       <FavIcon />
       <GlobalStyle />
       <Component {...pageProps} />
-    </NoWarTheme>
+    </XViewTheme>
   )
 }
 
-export default NoWarApp
+export default XViewUIApp

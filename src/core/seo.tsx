@@ -5,12 +5,12 @@ import Head from "next/head"
 export const DOMAIN = "nowarpls.org"
 
 export const COMPANY_NAME = "🕊️"
-export const TWITTER_HANDLE = "@nowarpls"
+export const TWITTER_HANDLE = "@"
 
 export const SEO: NextSeoProps = {
   titleTemplate: `${COMPANY_NAME} | %s`,
-  title: `No War PLS.`,
-  description: "No War PLS.",
+  title: `xView2 BDA UI`,
+  description: "xView2 BDA UI",
   additionalMetaTags: [
     {
       name: "keywords",
@@ -27,28 +27,28 @@ export const SEO: NextSeoProps = {
     cardType: "summary_large_image"
   },
   openGraph: {
-    site_name: "NoWarPls",
+    site_name: "xView2 BDA UI",
     type: "website",
     images: [
       {
         url: `https://www.${DOMAIN}/seo-800x600.png`,
         width: 800,
         height: 600,
-        alt: "NoWarPls Dove",
+        alt: "xView2 Dove",
         type: "image/png"
       },
       {
         url: `https://www.${DOMAIN}/seo-1200x630.png`,
         width: 1200,
         height: 630,
-        alt: "NoWarPls Dove",
+        alt: "xView2 Dove",
         type: "image/png"
       },
       {
         url: `https://www.${DOMAIN}/seo-1200x700.png`,
         width: 1200,
         height: 700,
-        alt: "NoWarPls Dove",
+        alt: "xView2 Dove",
         type: "image/png"
       }
     ]
