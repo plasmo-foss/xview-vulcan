@@ -12,7 +12,10 @@ import { useState } from "react"
 import { Map } from "react-map-gl"
 
 import { MainContainer } from "~features/layouts/main-container"
-import { CoordinateInput } from "~features/map-navigation/coordinate-input"
+import {
+  CoordinateInput,
+  latLngRegex
+} from "~features/map-navigation/coordinate-input"
 import {
   MapNavigationProvider,
   useMapNavigation
@@ -35,6 +38,8 @@ import {
 const Main = () => {
   const {
     viewState,
+    query,
+    setQuery,
     setBearing,
     setLatitude,
     setLongitude,
@@ -55,6 +60,9 @@ const Main = () => {
       <DeckGL
         initialViewState={viewState}
         onViewStateChange={({ viewState: newViewState }) => {
+          if (query.length === 0 || latLngRegex.test(query)) {
+            setQuery(`${newViewState.latitude}, ${newViewState.longitude}`)
+          }
           setLatitude(newViewState.latitude)
           setLongitude(newViewState.longitude)
           setZoom(newViewState.zoom)

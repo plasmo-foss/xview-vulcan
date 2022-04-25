@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, useState } from "react"
 
 const useMapNavigationProvider = () => {
+  const [query, setQuery] = useState("")
   const [longitude, setLongitude] = useState(21.09)
   const [latitude, setLatitude] = useState(19.86)
   const [zoom, setZoom] = useState(4)
@@ -20,6 +21,8 @@ const useMapNavigationProvider = () => {
 
   return {
     viewState,
+    query,
+    setQuery,
     setLongitude,
     setLatitude,
     setZoom,
