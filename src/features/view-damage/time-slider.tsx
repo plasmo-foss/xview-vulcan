@@ -9,9 +9,14 @@ const ReactSlider = dynamic(() => import("react-slider"), {
   ssr: false
 })
 
+export const ToggleSliderButton = styled(GetCoordinateButton)`
+  top: 80px;
+  left: 22px;
+`
+
 const SliderContainer = styled.div`
   position: absolute;
-  top: 80px;
+  top: 140px;
   left: 22px;
 
   .slider {
@@ -20,7 +25,7 @@ const SliderContainer = styled.div`
     align-items: center;
     justify-content: center;
     border-radius: 44px;
-    height: calc(88vh - 80px);
+    height: calc(80vh - 80px);
     width: 46px;
     border: 2px solid ${(p) => p.theme.colors.white};
     .track {
@@ -127,8 +132,3 @@ export const TimeSlider = () => {
     </SliderContainer>
   )
 }
-
-export const ToggleSliderButton = styled(GetCoordinateButton)`
-  top: 22px;
-  left: 22px;
-`

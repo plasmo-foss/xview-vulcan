@@ -12,6 +12,11 @@ import { useState } from "react"
 import { Map } from "react-map-gl"
 
 import { MainContainer } from "~features/layouts/main-container"
+import { CoordinateInput } from "~features/map-navigation/coordinate-input"
+import {
+  MapNavigationProvider,
+  useMapNavigation
+} from "~features/map-navigation/use-map-navigation"
 import { CoordinateInfo } from "~features/marking-coordinate/coordinate-info"
 import {
   GetCoordinateButton,
@@ -27,15 +32,16 @@ import {
   ToggleSliderButton
 } from "~features/view-damage/time-slider"
 
-const INITIAL_VIEW_STATE = {
-  longitude: -122.41669,
-  latitude: 37.7853,
-  zoom: 8,
-  pitch: 0,
-  bearing: 0
-}
-
 const Main = () => {
+  const {
+    viewState,
+    setBearing,
+    setLatitude,
+    setLongitude,
+    setPitch,
+    setZoom
+  } = useMapNavigation()
+
   const markCoordinate = useMarkCoordinate()
   const { gettingCoordinate, readyToSend } = markCoordinate
   const [staticLayers, setStaticLayers] = useState<
@@ -47,7 +53,15 @@ const Main = () => {
   return (
     <MainContainer>
       <DeckGL
-        initialViewState={INITIAL_VIEW_STATE}
+        initialViewState={viewState}
+        onViewStateChange={({ viewState: newViewState }) => {
+          setLatitude(newViewState.latitude)
+          setLongitude(newViewState.longitude)
+          setZoom(newViewState.zoom)
+          setBearing(newViewState.bearing)
+          setPitch(newViewState.pitch)
+        }}
+        controller={!gettingCoordinate}
         // getTooltip={(o) => {
         //   if (o.coordinate) {
         //     return (
@@ -69,8 +83,7 @@ const Main = () => {
         }}
         onHover={(e) => {
           markCoordinate.traceEnd(e)
-        }}
-        controller={!gettingCoordinate}>
+        }}>
         <Map
           customAttribution={`❤️☮️🤚 | www.plasmo.com | xView |`}
           mapStyle="mapbox://styles/mapbox/streets-v9"
@@ -79,6 +92,7 @@ const Main = () => {
         </Map>
       </DeckGL>
 
+      <CoordinateInput />
       {showSlider && <TimeSlider />}
 
       <ToggleSliderButton
@@ -116,9 +130,11 @@ const Main = () => {
 }
 
 const IndexPage: NextPage = () => (
-  <MarkCoordinateProvider>
-    <Main />
-  </MarkCoordinateProvider>
+  <MapNavigationProvider>
+    <MarkCoordinateProvider>
+      <Main />
+    </MarkCoordinateProvider>
+  </MapNavigationProvider>
 )
 
 export default IndexPage
