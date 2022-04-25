@@ -61,7 +61,11 @@ const Main = () => {
         initialViewState={viewState}
         onViewStateChange={({ viewState: newViewState }) => {
           if (query.length === 0 || latLngRegex.test(query)) {
-            setQuery(`${newViewState.latitude}, ${newViewState.longitude}`)
+            setQuery(
+              `${newViewState.latitude.toFixed(
+                6
+              )}, ${newViewState.longitude.toFixed(6)}`
+            )
           }
           setLatitude(newViewState.latitude)
           setLongitude(newViewState.longitude)
