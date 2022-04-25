@@ -1,36 +1,22 @@
-import { Layer as GenericLayer } from "@deck.gl/core"
-import DeckGL from "@deck.gl/react"
-import {
-  KeyframeAlignVertical,
-  RemoveKeyframeAlt,
-  Suggestion,
-  Svg3DRectThreePts
-} from "iconoir-react"
-import "mapbox-gl/dist/mapbox-gl.css"
-import type { NextPage } from "next"
-import { useState } from "react"
-import { Map } from "react-map-gl"
+import { Layer as GenericLayer } from "@deck.gl/core";
+import DeckGL from "@deck.gl/react";
+import { KeyframeAlignVertical, RemoveKeyframeAlt, Suggestion, Svg3DRectThreePts } from "iconoir-react";
+import "mapbox-gl/dist/mapbox-gl.css";
+import type { NextPage } from "next";
+import { useState } from "react";
+import { Map } from "react-map-gl";
 
-import { MainContainer } from "~features/layouts/main-container"
-import { CoordinateInput } from "~features/map-navigation/coordinate-input"
-import {
-  MapNavigationProvider,
-  useMapNavigation
-} from "~features/map-navigation/use-map-navigation"
-import { CoordinateInfo } from "~features/marking-coordinate/coordinate-info"
-import {
-  GetCoordinateButton,
-  SendCoordinateButton
-} from "~features/marking-coordinate/coordnate-button"
-import { StartAndEndMarkers } from "~features/marking-coordinate/map-markers"
-import {
-  MarkCoordinateProvider,
-  useMarkCoordinate
-} from "~features/marking-coordinate/mark-coordinate"
-import {
-  TimeSlider,
-  ToggleSliderButton
-} from "~features/view-damage/time-slider"
+
+
+import { MainContainer } from "~features/layouts/main-container";
+import { CoordinateInput } from "~features/map-navigation/coordinate-input";
+import { MapNavigationProvider, useMapNavigation } from "~features/map-navigation/use-map-navigation";
+import { CoordinateInfo } from "~features/marking-coordinate/coordinate-info";
+import { GetCoordinateButton, SendCoordinateButton } from "~features/marking-coordinate/coordnate-button";
+import { StartAndEndMarkers } from "~features/marking-coordinate/map-markers";
+import { MarkCoordinateProvider, useMarkCoordinate } from "~features/marking-coordinate/mark-coordinate";
+import { TimeSlider, ToggleSliderButton } from "~features/view-damage/time-slider";
+
 
 const Main = () => {
   const {
@@ -99,6 +85,7 @@ const Main = () => {
         title="Toggle Slider"
         active={showSlider}
         onClick={() => {
+          console.log(process.env.NEXT_PUBLIC_MAPBOX_KEY)
           setShowSlider(!showSlider)
         }}>
         {showSlider ? <RemoveKeyframeAlt /> : <KeyframeAlignVertical />}
@@ -136,5 +123,6 @@ const IndexPage: NextPage = () => (
     </MarkCoordinateProvider>
   </MapNavigationProvider>
 )
+
 
 export default IndexPage

@@ -55,8 +55,15 @@ export const CoordinateInput = () => {
           min={-180}
           max={180}
           placeholder="Longitude"
-          value={viewState.longitude}
+          value={viewState.longitude === 0 ? "" : viewState.longitude.toFixed(6)}
           onChange={(e) => {
+            const newLongitude = parseFloat(e.target.value)
+            if (isNaN(newLongitude)) {
+              setLongitude(0)
+              return
+            } else if (Math.abs(newLongitude) > 180) {
+              return
+            }
             setLongitude(parseFloat(e.target.value))
           }}
         />
@@ -66,12 +73,15 @@ export const CoordinateInput = () => {
         <input
           type="number"
           placeholder="Latitude"
-          value={viewState.latitude}
+          value={viewState.latitude === 0 ? "" : viewState.latitude.toFixed(6)}
           min={-90}
           max={90}
           onChange={(e) => {
             const newLatitude = parseFloat(e.target.value)
             if (isNaN(newLatitude)) {
+              setLatitude(0)
+              return
+            } else if (Math.abs(newLatitude) > 90) {
               return
             }
             setLatitude(newLatitude)
