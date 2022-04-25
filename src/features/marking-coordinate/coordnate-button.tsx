@@ -40,6 +40,6 @@ export const SendCoordinateButton = styled(GetCoordinateButton)`
 
   &:hover {
     background: ${(p) =>
-      p.disabled ? p.theme.colors.gray : p.theme.colors.darkPrimary};
+      p.disabled ? p.theme.colors.gray : p.theme.colors.subtleGray};
   }
 `
