@@ -19,13 +19,13 @@ const theme = {
   colors: Color.palette
 }
 
-type NoWarTheme = typeof theme
+type XViewTheme = typeof theme
 
 declare module "@emotion/react" {
-  export interface Theme extends NoWarTheme {}
+  export interface Theme extends XViewTheme {}
 }
 
-export const NoWarTheme = ({ children = null as ReactNode }) => (
+export const XViewTheme = ({ children = null as ReactNode }) => (
   <ThemeProvider theme={theme}>
     <GlobalStyle />
     {children}
