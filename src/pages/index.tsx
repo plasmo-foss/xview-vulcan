@@ -103,7 +103,10 @@ const Main = () => {
       <SendCoordinateButton
         top={80}
         title="Mark for ML Assessment Queue"
-        disabled={!readyToSend}>
+        disabled={!readyToSend}
+        onClick={() => {
+          markCoordinate.sendCoordinate()
+        }}>
         <Suggestion />
       </SendCoordinateButton>
 

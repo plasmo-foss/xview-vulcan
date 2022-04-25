@@ -3,6 +3,8 @@ declare namespace NodeJS {
     PUBLIC_URL: string
     VERCEL_ENV: "production" | "preview" | "development"
 
+    AI_INTERNAL_ENDPOINT: string
+
     NEXT_PUBLIC_MAPBOX_KEY: string
   }
 }

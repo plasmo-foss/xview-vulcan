@@ -83,7 +83,28 @@ const useMarkCoordinateProvider = () => {
     )
   }
 
+  const sendCoordinate = async () => {
+    await fetch("/api/send-coord", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        startPos,
+        endPos
+      })
+    })
+
+    setHasBoundary(false)
+    setStartPos(undefined)
+    setEndPos(undefined)
+    setLineLayer(null)
+
+    alert("Coordinate queued for AI Assessment")
+  }
+
   return {
+    sendCoordinate,
     toggleGettingCoordinate,
     toggleStart,
     traceEnd,
