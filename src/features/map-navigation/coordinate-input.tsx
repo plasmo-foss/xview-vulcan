@@ -49,10 +49,10 @@ const InputContainer = styled.div`
 `
 
 export const latLngRegex =
-  /^(?<lat>([-+]?)([\d]{1,2})(((\.)(\d+)))),(\s*)(?<lng>([-+]?)([\d]{1,3})((\.)(\d+))?)$/
+  /^(?<lat>([-+]?)([\d]{1,2})(((\.)(\d+)))?),(\s*)(?<lng>([-+]?)([\d]{1,3})((\.)(\d+))?)$/
 
 export const CoordinateInput = () => {
-  const { setLatitude, setLongitude, query, setQuery } = useMapNavigation()
+  const { setCoordinate, query, setQuery } = useMapNavigation()
 
   return (
     <CoordinateInputContainer>
@@ -86,8 +86,9 @@ export const CoordinateInput = () => {
                 return
               }
 
-              setLatitude(newLat)
-              setLongitude(newLng)
+              setCoordinate(newLat, newLng, {
+                overideQuery: false
+              })
             }
           }}
         />

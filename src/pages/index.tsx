@@ -1,9 +1,10 @@
-import { Layer as GenericLayer } from "@deck.gl/core"
+import { GeoJsonLayer } from "@deck.gl/layers"
 import DeckGL from "@deck.gl/react"
 import {
   KeyframeAlignVertical,
   RemoveKeyframeAlt,
   Suggestion,
+  Svg3DCenterBox,
   Svg3DRectThreePts
 } from "iconoir-react"
 import "mapbox-gl/dist/mapbox-gl.css"
@@ -11,18 +12,17 @@ import type { NextPage } from "next"
 import { useState } from "react"
 import { Map } from "react-map-gl"
 
+import { ActionButton } from "~features/layouts/action-button"
+import { RightPanelContainer } from "~features/layouts/control-panel"
 import { MainContainer } from "~features/layouts/main-container"
-import {
-  CoordinateInput,
-  latLngRegex
-} from "~features/map-navigation/coordinate-input"
+import { CoordinateInput } from "~features/map-navigation/coordinate-input"
 import {
   MapNavigationProvider,
   useMapNavigation
 } from "~features/map-navigation/use-map-navigation"
 import { CoordinateInfo } from "~features/marking-coordinate/coordinate-info"
 import {
-  GetCoordinateButton,
+  MarkCoordinateButton,
   SendCoordinateButton
 } from "~features/marking-coordinate/coordnate-button"
 import { StartAndEndMarkers } from "~features/marking-coordinate/map-markers"
@@ -36,22 +36,16 @@ import {
 } from "~features/view-damage/time-slider"
 
 const Main = () => {
-  const {
-    viewState,
-    query,
-    setQuery,
-    setBearing,
-    setLatitude,
-    setLongitude,
-    setPitch,
-    setZoom
-  } = useMapNavigation()
+  const { viewState, setBearing, setCoordinate, setPitch, setZoom } =
+    useMapNavigation()
 
   const markCoordinate = useMarkCoordinate()
   const { gettingCoordinate, readyToSend } = markCoordinate
-  const [staticLayers, setStaticLayers] = useState<
-    Array<GenericLayer<any, any>>
-  >([])
+  // const [staticLayers, setStaticLayers] = useState<
+  //   Array<GenericLayer<any, any>>
+  // >([])
+
+  const [geoJsonLayer, setGeoJsonLayer] = useState<GeoJsonLayer<any>>()
 
   const [showSlider, setShowSlider] = useState(true)
 
@@ -60,15 +54,9 @@ const Main = () => {
       <DeckGL
         initialViewState={viewState}
         onViewStateChange={({ viewState: newViewState }) => {
-          if (query.length === 0 || latLngRegex.test(query)) {
-            setQuery(
-              `${newViewState.latitude.toFixed(
-                6
-              )}, ${newViewState.longitude.toFixed(6)}`
-            )
-          }
-          setLatitude(newViewState.latitude)
-          setLongitude(newViewState.longitude)
+          setCoordinate(newViewState.latitude, newViewState.longitude, {
+            fixed: true
+          })
           setZoom(newViewState.zoom)
           setBearing(newViewState.bearing)
           setPitch(newViewState.pitch)
@@ -82,7 +70,7 @@ const Main = () => {
         //     )
         //   }
         // }}
-        layers={[...staticLayers, markCoordinate.lineLayer]}
+        layers={[markCoordinate.lineLayer, geoJsonLayer]}
         getCursor={(s) => {
           return gettingCoordinate
             ? readyToSend
@@ -116,25 +104,59 @@ const Main = () => {
         {showSlider ? <RemoveKeyframeAlt /> : <KeyframeAlignVertical />}
       </ToggleSliderButton>
 
-      <GetCoordinateButton
-        title="Get Coordinate"
-        active={gettingCoordinate}
-        onClick={() => {
-          markCoordinate.toggleGettingCoordinate()
-          setStaticLayers(!gettingCoordinate ? [] : [])
-        }}>
-        <Svg3DRectThreePts />
-      </GetCoordinateButton>
+      <RightPanelContainer>
+        <MarkCoordinateButton
+          title="Get Coordinate"
+          active={gettingCoordinate}
+          onClick={() => {
+            markCoordinate.toggleGettingCoordinate()
+          }}>
+          <Svg3DRectThreePts />
+        </MarkCoordinateButton>
 
-      <SendCoordinateButton
-        top={80}
-        title="Mark for ML Assessment Queue"
-        disabled={!readyToSend}
-        onClick={() => {
-          markCoordinate.sendCoordinate()
-        }}>
-        <Suggestion />
-      </SendCoordinateButton>
+        <SendCoordinateButton
+          title="Mark for ML Assessment Queue"
+          disabled={!readyToSend}
+          onClick={() => {
+            markCoordinate.sendCoordinate()
+          }}>
+          <Suggestion />
+        </SendCoordinateButton>
+
+        <ActionButton
+          title="Toggle GeoJSON"
+          active={!!geoJsonLayer}
+          onClick={() => {
+            if (!!geoJsonLayer) {
+              setGeoJsonLayer(null)
+            } else {
+              setCoordinate(50.454, 30.501)
+              setZoom(14)
+
+              setGeoJsonLayer(
+                new GeoJsonLayer({
+                  id: "geojson-layer",
+                  data: fetch("/sample-geo.json").then((r) => r.json()),
+                  pickable: true,
+                  stroked: true,
+                  filled: true,
+                  // extruded: true,
+                  pointType: "circle",
+                  lineWidthScale: 20,
+                  lineWidthMinPixels: 2,
+                  getFillColor: [180, 0, 0, 200],
+                  getLineColor: [160, 0, 0, 255],
+                  // getLineColor: (d) => colorToRGBArray(d.properties.color),
+                  getPointRadius: 100,
+                  getLineWidth: 1,
+                  getElevation: 1
+                })
+              )
+            }
+          }}>
+          <Svg3DCenterBox />
+        </ActionButton>
+      </RightPanelContainer>
 
       <CoordinateInfo />
     </MainContainer>

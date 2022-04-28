@@ -1,5 +1,7 @@
 import { createContext, useContext, useMemo, useState } from "react"
 
+import { latLngRegex } from "./coordinate-input"
+
 const useMapNavigationProvider = () => {
   const [query, setQuery] = useState("")
   const [longitude, setLongitude] = useState(21.09)
@@ -19,12 +21,25 @@ const useMapNavigationProvider = () => {
     [longitude, latitude, zoom, bearing, pitch]
   )
 
+  const setCoordinate = (
+    lat: number,
+    lng: number,
+    { fixed = false, overideQuery = true } = {}
+  ) => {
+    if (overideQuery && (query.length === 0 || latLngRegex.test(query))) {
+      setQuery(
+        fixed ? `${lat.toFixed(6)}, ${lng.toFixed(6)}` : `${lat}, ${lng}`
+      )
+    }
+    setLatitude(lat)
+    setLongitude(lng)
+  }
+
   return {
     viewState,
     query,
     setQuery,
-    setLongitude,
-    setLatitude,
+    setCoordinate,
     setZoom,
     setBearing,
     setPitch

@@ -50,10 +50,10 @@ export const CoordinateInfo = () => {
       {endPos && (
         <CoordinateGroup>
           <div>
-            {endPos[0].toFixed(6)}
-            <b>- LNG </b> <br />
             {endPos[1].toFixed(6)}
-            <b>- LAT</b>
+            <b>- LAT</b> <br />
+            {endPos[0].toFixed(6)}
+            <b>- LNG </b>
           </div>
           <h3>
             <MinusPinAlt />
@@ -63,10 +63,11 @@ export const CoordinateInfo = () => {
       {startPos && (
         <CoordinateGroup>
           <div>
-            {startPos[0].toFixed(6)}
-            <b>- LNG </b> <br />
             {startPos[1].toFixed(6)}
             <b>- LAT</b>
+            <br />
+            {startPos[0].toFixed(6)}
+            <b>- LNG </b>
           </div>
           <h3>
             <AddPinAlt />
@@ -76,10 +77,10 @@ export const CoordinateInfo = () => {
 
       <CoordinateGroup>
         <div>
-          {cursorPos && cursorPos[0].toFixed(6)}
-          <b>- LNG </b> <br />
           {cursorPos && cursorPos[1].toFixed(6)}
-          <b>- LAT</b>
+          <b>- LAT</b> <br />
+          {cursorPos && cursorPos[0].toFixed(6)}
+          <b>- LNG </b>
         </div>
         <h3>
           <CursorPointer />

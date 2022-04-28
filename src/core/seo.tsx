@@ -4,14 +4,12 @@ import Head from "next/head"
 
 export const DOMAIN = "nowarpls.org"
 
-export const COMPANY_NAME = "🖖"
-export const TWITTER_HANDLE = "@vulcan.xview"
-
-const title = `xView Vulcan`
+export const COMPANY_NAME = "xView Vulcan"
+export const TWITTER_HANDLE = "@xview.vulcan"
 
 export const SEO: NextSeoProps = {
   titleTemplate: `${COMPANY_NAME} | %s`,
-  title,
+  title: "BDA UI",
   description: "User interface for xView Building Damage Assessment.",
   additionalMetaTags: [
     {
@@ -29,28 +27,28 @@ export const SEO: NextSeoProps = {
     cardType: "summary_large_image"
   },
   openGraph: {
-    site_name: title,
+    site_name: COMPANY_NAME,
     type: "website",
     images: [
       {
         url: `https://www.${DOMAIN}/seo-800x600.png`,
         width: 800,
         height: 600,
-        alt: `${title} Dove`,
+        alt: `${COMPANY_NAME} Dove`,
         type: "image/png"
       },
       {
         url: `https://www.${DOMAIN}/seo-1200x630.png`,
         width: 1200,
         height: 630,
-        alt: `${title} Dove`,
+        alt: `${COMPANY_NAME} Dove`,
         type: "image/png"
       },
       {
         url: `https://www.${DOMAIN}/seo-1200x700.png`,
         width: 1200,
         height: 700,
-        alt: `${title} Dove`,
+        alt: `${COMPANY_NAME} Dove`,
         type: "image/png"
       }
     ]

@@ -3,13 +3,14 @@ import { Keyframe, KeyframePosition } from "iconoir-react"
 import dynamic from "next/dynamic"
 import { useState } from "react"
 
-import { GetCoordinateButton } from "~features/marking-coordinate/coordnate-button"
+import { ActionButton } from "~features/layouts/action-button"
 
 const ReactSlider = dynamic(() => import("react-slider"), {
   ssr: false
 })
 
-export const ToggleSliderButton = styled(GetCoordinateButton)`
+export const ToggleSliderButton = styled(ActionButton)`
+  position: absolute;
   top: 80px;
   left: 22px;
 `
