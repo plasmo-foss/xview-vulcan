@@ -1,11 +1,13 @@
-import { GeoJsonLayer } from "@deck.gl/layers"
+import { TileLayer } from "@deck.gl/geo-layers"
+import { BitmapLayer, GeoJsonLayer } from "@deck.gl/layers"
 import DeckGL from "@deck.gl/react"
 import {
   KeyframeAlignVertical,
   RemoveKeyframeAlt,
   Suggestion,
   Svg3DCenterBox,
-  Svg3DRectThreePts
+  Svg3DRectThreePts,
+  PerspectiveView
 } from "iconoir-react"
 import "mapbox-gl/dist/mapbox-gl.css"
 import type { NextPage } from "next"
@@ -46,6 +48,7 @@ const Main = () => {
   // >([])
 
   const [geoJsonLayer, setGeoJsonLayer] = useState<GeoJsonLayer<any>>()
+  const [geoRasterLayer, setgeoRasterLayer] = useState<BitmapLayer<any>>()
 
   const [showSlider, setShowSlider] = useState(true)
 
@@ -70,7 +73,7 @@ const Main = () => {
         //     )
         //   }
         // }}
-        layers={[markCoordinate.lineLayer, geoJsonLayer]}
+        layers={[markCoordinate.lineLayer, geoJsonLayer, geoRasterLayer]}
         getCursor={(s) => {
           return gettingCoordinate
             ? readyToSend
@@ -156,10 +159,32 @@ const Main = () => {
           }}>
           <Svg3DCenterBox />
         </ActionButton>
+
+        <ActionButton
+          title="Toggle raster"
+          active={!!geoRasterLayer}
+          onClick={() => {
+            if (!!geoRasterLayer) {
+              setgeoRasterLayer(null)
+            } else {
+              setCoordinate(37.723613, -122.39383950)
+              setZoom(11)
+
+              setgeoRasterLayer(
+                new BitmapLayer({
+                  id: 'bitmap-layer',
+                  bounds: [-122.5190, 37.7045, -122.355, 37.829],
+                  image: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/sf-districts.png'
+                })
+              )
+            }
+          }}>
+          <PerspectiveView />
+        </ActionButton>
       </RightPanelContainer>
 
       <CoordinateInfo />
-    </MainContainer>
+    </MainContainer >
   )
 }
 
