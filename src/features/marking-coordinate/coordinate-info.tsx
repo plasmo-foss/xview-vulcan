@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import { AddPinAlt, CursorPointer, MinusPinAlt } from "iconoir-react"
 import { rgba } from "polished"
 
-import { useMarkCoordinate } from "~features/marking-coordinate/mark-coordinate"
+import { useMarkCoordinate } from "~features/marking-coordinate/use-mark-coordinate"
 
 const CoordinateInfoContainer = styled.div`
   pointer-events: none;

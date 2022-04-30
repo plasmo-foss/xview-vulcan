@@ -1,4 +1,6 @@
-import { createContext, useContext, useMemo, useState } from "react"
+import { useContext, useMemo, useState } from "react"
+
+import { createProvider } from "~core/base-provider"
 
 import { latLngRegex } from "./coordinate-input"
 
@@ -46,18 +48,8 @@ const useMapNavigationProvider = () => {
   }
 }
 
-type MapNavigationContextProps = ReturnType<typeof useMapNavigationProvider>
+const { BaseContext, Provider } = createProvider(useMapNavigationProvider)
 
-const MapNavigationContext = createContext<MapNavigationContextProps>(null)
+export const MapNavigationProvider = Provider
 
-export const MapNavigationProvider = ({ children = null }) => {
-  const provider = useMapNavigationProvider()
-
-  return (
-    <MapNavigationContext.Provider value={provider}>
-      {children}
-    </MapNavigationContext.Provider>
-  )
-}
-
-export const useMapNavigation = () => useContext(MapNavigationContext)
+export const useMapNavigation = () => useContext(BaseContext)

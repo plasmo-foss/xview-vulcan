@@ -1,7 +1,7 @@
 import { AddPinAlt, MinusPinAlt } from "iconoir-react"
 import { Marker } from "react-map-gl"
 
-import { useMarkCoordinate } from "./mark-coordinate"
+import { useMarkCoordinate } from "./use-mark-coordinate"
 
 export const StartAndEndMarkers = () => {
   const { startPos, endPos } = useMarkCoordinate()

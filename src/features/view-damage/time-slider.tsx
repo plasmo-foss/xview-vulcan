@@ -1,9 +1,12 @@
+import { BitmapLayer } from "@deck.gl/layers"
 import styled from "@emotion/styled"
 import { Keyframe, KeyframePosition } from "iconoir-react"
 import dynamic from "next/dynamic"
 import { useState } from "react"
 
 import { ActionButton } from "~features/layouts/action-button"
+
+import { useViewDamage } from "./use-view-damage"
 
 const ReactSlider = dynamic(() => import("react-slider"), {
   ssr: false
@@ -41,8 +44,11 @@ const SliderContainer = styled.div`
       margin-bottom: 22px;
       border-radius: 100%;
       background: ${(p) => p.theme.colors.white};
+      transition: 0.2s ease-in-out;
+      position: relative;
+
       &:hover {
-        transform: scale(1.1);
+        background: ${(p) => p.theme.colors.secondary};
       }
     }
     .thumb {
@@ -81,45 +87,91 @@ const Timestamp = styled.div`
   background-color: ${(p) => p.theme.colors.white};
 `
 
-const startDate = new Date("2022-02-14")
-
-const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000
-const PERIOD_IN_MS = ONE_DAY_IN_MS * 7
-
-const getDateList = (startDate: Date, endDate = new Date()) =>
-  Array(
-    Math.floor((endDate.getTime() - startDate.getTime()) / PERIOD_IN_MS) + 1
-  )
-    .fill(null)
-    .map((_, idx) => new Date(startDate.getTime() + idx * PERIOD_IN_MS))
-
-const dateList = getDateList(startDate)
-
-const max = dateList.length - 1
+const MarkTimestamp = styled(Timestamp)`
+  transition: 0.2s ease-in-out;
+  pointer-events: none;
+  left: 36px;
+  z-index: 5;
+  color: ${(p) => p.theme.colors.white};
+  background-color: ${(p) => p.theme.colors.secondary};
+`
 
 const Mark = (props: any) => {
   const [hover, setHover] = useState(false)
 
-  return <div {...props}></div>
+  return (
+    <div
+      {...props}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}>
+      <MarkTimestamp
+        style={{
+          opacity: hover ? 1 : 0
+        }}>
+        {props.date}
+      </MarkTimestamp>
+    </div>
+  )
 }
 
 export const TimeSlider = () => {
+  const { dateList, max, dateImageMap, setPostLayers, setPreLayers } =
+    useViewDamage()
+
   return (
     <SliderContainer>
       <ReactSlider
+        onChange={([preIndex, postIndex]: number[]) => {
+          const preDate = dateList[preIndex]
+          const postDate = dateList[postIndex]
+          // console.log(preDate, postDate)
+
+          // console.log(dateImageMap[postDate.toISOString()])
+
+          const postData = dateImageMap[postDate.toISOString()]
+          const preData = dateImageMap[preDate.toISOString()]
+
+          setPostLayers([
+            new BitmapLayer({
+              id: "post-layer",
+              pickable: true,
+              bounds: postData.bounds,
+              image: postData.url,
+              opacity: 0.6
+              // desaturate: 0.5,
+              // tintColor: [128, 256, 128],
+              // transparentColor: [32, 256, 32, 256]
+            })
+          ])
+          setPreLayers([
+            new BitmapLayer({
+              id: "pre-layer",
+              pickable: true,
+              bounds: preData.bounds,
+              image: preData.url,
+              opacity: 1
+              // desaturate: 0.5,
+              // tintColor: [128, 128, 256],
+              // transparentColor: [256, 32, 32, 0]
+              // desaturate: 0.1
+            })
+          ])
+        }}
         className="slider"
         thumbClassName="thumb"
         markClassName="mark"
         trackClassName="track"
         ariaLabel={["start", "end"] as never}
         defaultValue={[0, max] as never}
-        marks={true}
+        marks
         pearling
         min={0}
         max={max}
         orientation="vertical"
         invert
-        renderMark={(props) => <Mark {...props} />}
+        renderMark={(props) => (
+          <Mark {...props} date={dateList[props.key].toDateString()} />
+        )}
         renderThumb={(props, state) => {
           const isStart = props["aria-label"] === "start"
           return (

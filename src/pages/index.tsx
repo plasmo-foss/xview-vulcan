@@ -1,17 +1,12 @@
 import { GeoJsonLayer } from "@deck.gl/layers"
 import DeckGL from "@deck.gl/react"
-import {
-  KeyframeAlignVertical,
-  RemoveKeyframeAlt,
-  Suggestion,
-  Svg3DCenterBox,
-  Svg3DRectThreePts
-} from "iconoir-react"
+import { Suggestion, Svg3DCenterBox, Svg3DRectThreePts } from "iconoir-react"
 import "mapbox-gl/dist/mapbox-gl.css"
 import type { NextPage } from "next"
 import { useState } from "react"
 import { Map } from "react-map-gl"
 
+import packageJson from "~/../package.json"
 import { ActionButton } from "~features/layouts/action-button"
 import { RightPanelContainer } from "~features/layouts/control-panel"
 import { MainContainer } from "~features/layouts/main-container"
@@ -29,11 +24,12 @@ import { StartAndEndMarkers } from "~features/marking-coordinate/map-markers"
 import {
   MarkCoordinateProvider,
   useMarkCoordinate
-} from "~features/marking-coordinate/mark-coordinate"
+} from "~features/marking-coordinate/use-mark-coordinate"
+import { ViewDamagePanel } from "~features/view-damage"
 import {
-  TimeSlider,
-  ToggleSliderButton
-} from "~features/view-damage/time-slider"
+  ViewDamageProvider,
+  useViewDamage
+} from "~features/view-damage/use-view-damage"
 
 const Main = () => {
   const { viewState, setBearing, setCoordinate, setPitch, setZoom } =
@@ -41,13 +37,10 @@ const Main = () => {
 
   const markCoordinate = useMarkCoordinate()
   const { gettingCoordinate, readyToSend } = markCoordinate
-  // const [staticLayers, setStaticLayers] = useState<
-  //   Array<GenericLayer<any, any>>
-  // >([])
+
+  const { postLayers, preLayers } = useViewDamage()
 
   const [geoJsonLayer, setGeoJsonLayer] = useState<GeoJsonLayer<any>>()
-
-  const [showSlider, setShowSlider] = useState(true)
 
   return (
     <MainContainer>
@@ -70,7 +63,12 @@ const Main = () => {
         //     )
         //   }
         // }}
-        layers={[markCoordinate.lineLayer, geoJsonLayer]}
+        layers={[
+          ...preLayers,
+          ...postLayers,
+          markCoordinate.lineLayer,
+          geoJsonLayer
+        ]}
         getCursor={(s) => {
           return gettingCoordinate
             ? readyToSend
@@ -85,7 +83,7 @@ const Main = () => {
           markCoordinate.traceEnd(e)
         }}>
         <Map
-          customAttribution={`❤️☮️🤚 | www.plasmo.com | xView |`}
+          customAttribution={`❤️☮️🤚 | www.plasmo.com | ${packageJson.name}@${packageJson.version}`}
           mapStyle="mapbox://styles/mapbox/streets-v9"
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_KEY}>
           <StartAndEndMarkers />
@@ -93,16 +91,7 @@ const Main = () => {
       </DeckGL>
 
       <CoordinateInput />
-      {showSlider && <TimeSlider />}
-
-      <ToggleSliderButton
-        title="Toggle Slider"
-        active={showSlider}
-        onClick={() => {
-          setShowSlider(!showSlider)
-        }}>
-        {showSlider ? <RemoveKeyframeAlt /> : <KeyframeAlignVertical />}
-      </ToggleSliderButton>
+      <ViewDamagePanel />
 
       <RightPanelContainer>
         <MarkCoordinateButton
@@ -166,7 +155,9 @@ const Main = () => {
 const IndexPage: NextPage = () => (
   <MapNavigationProvider>
     <MarkCoordinateProvider>
-      <Main />
+      <ViewDamageProvider>
+        <Main />
+      </ViewDamageProvider>
     </MarkCoordinateProvider>
   </MapNavigationProvider>
 )

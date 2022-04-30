@@ -1,7 +1,9 @@
 import { Layer as GenericLayer, Position } from "@deck.gl/core"
 import { DataSet } from "@deck.gl/core/lib/layer"
 import { LineLayer, PickInfo } from "deck.gl"
-import { createContext, useContext, useMemo, useState } from "react"
+import { useContext, useEffect, useMemo, useState } from "react"
+
+import { createProvider } from "~core/base-provider"
 
 const useMarkCoordinateProvider = () => {
   const [startPos, setStartPos] = useState<Position>()
@@ -52,10 +54,36 @@ const useMarkCoordinateProvider = () => {
     }
 
     setEndPos(e.coordinate)
+  }
+
+  const sendCoordinate = async () => {
+    await fetch("/api/send-coord", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        startPos,
+        endPos
+      })
+    })
+
+    setHasBoundary(false)
+    setStartPos(undefined)
+    setEndPos(undefined)
+    setLineLayer(null)
+
+    alert("Coordinate queued for AI Assessment")
+  }
+
+  useEffect(() => {
+    if (!startPos || !endPos) {
+      return
+    }
 
     const [startLon, startLat] = startPos
 
-    const [endLon, endLat] = e.coordinate
+    const [endLon, endLat] = endPos
 
     setLineLayer(
       new LineLayer({
@@ -81,27 +109,7 @@ const useMarkCoordinateProvider = () => {
         ] as DataSet<Position>
       })
     )
-  }
-
-  const sendCoordinate = async () => {
-    await fetch("/api/send-coord", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        startPos,
-        endPos
-      })
-    })
-
-    setHasBoundary(false)
-    setStartPos(undefined)
-    setEndPos(undefined)
-    setLineLayer(null)
-
-    alert("Coordinate queued for AI Assessment")
-  }
+  }, [startPos, endPos])
 
   return {
     sendCoordinate,
@@ -117,18 +125,8 @@ const useMarkCoordinateProvider = () => {
   }
 }
 
-type MarkCoordinateContextProps = ReturnType<typeof useMarkCoordinateProvider>
+const { BaseContext, Provider } = createProvider(useMarkCoordinateProvider)
 
-const MarkCoordinateContext = createContext<MarkCoordinateContextProps>(null)
+export const MarkCoordinateProvider = Provider
 
-export const MarkCoordinateProvider = ({ children = null }) => {
-  const provider = useMarkCoordinateProvider()
-
-  return (
-    <MarkCoordinateContext.Provider value={provider}>
-      {children}
-    </MarkCoordinateContext.Provider>
-  )
-}
-
-export const useMarkCoordinate = () => useContext(MarkCoordinateContext)
+export const useMarkCoordinate = () => useContext(BaseContext)
