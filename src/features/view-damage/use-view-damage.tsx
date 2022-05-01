@@ -1,8 +1,7 @@
 import { Position } from "@deck.gl/core"
 import { BitmapLayer } from "@deck.gl/layers"
+import { createProvider } from "puro"
 import { useContext, useState } from "react"
-
-import { createProvider } from "~core/base-provider"
 
 import { dateImageMap, dateList, max, startDate } from "./mock-data"
 

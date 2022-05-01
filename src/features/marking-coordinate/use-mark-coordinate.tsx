@@ -1,9 +1,9 @@
 import { Layer as GenericLayer, Position } from "@deck.gl/core"
 import { DataSet } from "@deck.gl/core/lib/layer"
 import { LineLayer, PickInfo } from "deck.gl"
+import { createProvider } from "puro"
 import { useContext, useEffect, useMemo, useState } from "react"
 
-import { createProvider } from "~core/base-provider"
 
 const useMarkCoordinateProvider = () => {
   const [startPos, setStartPos] = useState<Position>()

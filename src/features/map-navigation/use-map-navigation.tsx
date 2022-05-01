@@ -1,6 +1,5 @@
+import { createProvider } from "puro"
 import { useContext, useMemo, useState } from "react"
-
-import { createProvider } from "~core/base-provider"
 
 import { latLngRegex } from "./coordinate-input"
 
