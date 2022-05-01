@@ -1,32 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from "next"
+import nextConnect from "next-connect"
 
-type Data = {
-  email: string
-}
+import { ApiHandler, checkOrigin } from "./_common"
 
 const serverEndpoint = `${process.env.AI_INTERNAL_ENDPOINT}/send-coordinates`
 
-const allowSet = new Set([
-  "https://www.nowarpls.org",
-  "https://nowarpls.org",
-  "https://no-war-pls.vercel.app",
-  "http://localhost:1986"
-])
+const handler: ApiHandler = nextConnect().use(checkOrigin)
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  if (req.method !== "POST") {
-    res.status(404).end()
-    return
-  }
-
-  if (!allowSet.has(req.headers.origin)) {
-    res.status(403).end()
-    return
-  }
-
+handler.post(async (req, res) => {
   const { startPos, endPos } = req.body
 
   const result = await fetch(serverEndpoint, {
@@ -42,5 +22,14 @@ export default async function handler(
     })
   })
 
-  res.status(result.status === 200 ? 200 : 400).end()
-}
+  if (result.status !== 200) {
+    res.status(result.status).end()
+    return
+  }
+
+  res.status(200).json({
+    jobId: await result.text()
+  })
+})
+
+export default handler

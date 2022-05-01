@@ -1,4 +1,4 @@
-import { BitmapLayer } from "@deck.gl/layers"
+import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
 import { Keyframe, KeyframePosition } from "iconoir-react"
 import dynamic from "next/dynamic"
@@ -6,7 +6,7 @@ import { useState } from "react"
 
 import { ActionButton } from "~features/layouts/action-button"
 
-import { useViewDamage } from "./use-view-damage"
+import { LayerPeriod, useViewDamage } from "./use-view-damage"
 
 const ReactSlider = dynamic(() => import("react-slider"), {
   ssr: false
@@ -115,8 +115,10 @@ const Mark = (props: any) => {
 }
 
 export const TimeSlider = () => {
-  const { dateList, max, dateImageMap, setPostLayers, setPreLayers } =
+  const { dateList, max, dateImageMap, activePeriod, setActivePeriod } =
     useViewDamage()
+
+  const theme = useTheme()
 
   return (
     <SliderContainer>
@@ -130,38 +132,12 @@ export const TimeSlider = () => {
 
           const postData = dateImageMap[postDate.toISOString()]
           const preData = dateImageMap[preDate.toISOString()]
-
-          setPostLayers([
-            new BitmapLayer({
-              id: "post-layer",
-              pickable: true,
-              bounds: postData.bounds,
-              image: postData.url,
-              opacity: 0.6
-              // desaturate: 0.5,
-              // tintColor: [128, 256, 128],
-              // transparentColor: [32, 256, 32, 256]
-            })
-          ])
-          setPreLayers([
-            new BitmapLayer({
-              id: "pre-layer",
-              pickable: true,
-              bounds: preData.bounds,
-              image: preData.url,
-              opacity: 1
-              // desaturate: 0.5,
-              // tintColor: [128, 128, 256],
-              // transparentColor: [256, 32, 32, 0]
-              // desaturate: 0.1
-            })
-          ])
         }}
         className="slider"
         thumbClassName="thumb"
         markClassName="mark"
         trackClassName="track"
-        ariaLabel={["start", "end"] as never}
+        ariaLabel={[LayerPeriod.Pre, LayerPeriod.Post] as never}
         defaultValue={[0, max] as never}
         marks
         pearling
@@ -173,10 +149,27 @@ export const TimeSlider = () => {
           <Mark {...props} date={dateList[props.key].toDateString()} />
         )}
         renderThumb={(props, state) => {
-          const isStart = props["aria-label"] === "start"
+          const label = props["aria-label"] as LayerPeriod
+
+          const isPre = label === LayerPeriod.Pre
+          const isActive = label === activePeriod
+
           return (
-            <div {...props}>
-              {isStart ? <KeyframePosition /> : <Keyframe />}
+            <div
+              {...props}
+              style={{
+                ...props.style,
+                backgroundColor: isActive
+                  ? theme.colors.secondary
+                  : theme.colors.white,
+                color: isActive ? theme.colors.white : theme.colors.darkPrimary
+              }}
+              onClick={() =>
+                setActivePeriod((c) =>
+                  c === label ? LayerPeriod.Default : label
+                )
+              }>
+              {isPre ? <KeyframePosition /> : <Keyframe />}
               <Timestamp>{dateList[state.valueNow].toDateString()}</Timestamp>
             </div>
           )

@@ -38,7 +38,7 @@ const Main = () => {
   const markCoordinate = useMarkCoordinate()
   const { gettingCoordinate, readyToSend } = markCoordinate
 
-  const { postLayers, preLayers } = useViewDamage()
+  const { damageLayer } = useViewDamage()
 
   const [geoJsonLayer, setGeoJsonLayer] = useState<GeoJsonLayer<any>>()
 
@@ -63,12 +63,7 @@ const Main = () => {
         //     )
         //   }
         // }}
-        layers={[
-          ...preLayers,
-          ...postLayers,
-          markCoordinate.lineLayer,
-          geoJsonLayer
-        ]}
+        layers={[damageLayer, markCoordinate.lineLayer, geoJsonLayer]}
         getCursor={(s) => {
           return gettingCoordinate
             ? readyToSend

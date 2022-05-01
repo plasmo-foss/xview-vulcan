@@ -1,21 +1,25 @@
-import { Position } from "@deck.gl/core"
-import { BitmapLayer } from "@deck.gl/layers"
+import { TileLayer } from "@deck.gl/geo-layers"
 import { createProvider } from "puro"
 import { useContext, useState } from "react"
 
 import { dateImageMap, dateList, max, startDate } from "./mock-data"
 
-const useViewDamageProvider = () => {
-  const [preLayers, setPreLayers] = useState<Array<BitmapLayer<Position>>>([])
+export enum LayerPeriod {
+  Default = "default",
+  Pre = "pre",
+  Post = "post"
+}
 
-  const [postLayers, setPostLayers] = useState<Array<BitmapLayer<Position>>>([])
+const useViewDamageProvider = () => {
+  const [damageLayer, setDamageLayer] = useState<TileLayer<any>>(null)
+
+  const [activePeriod, setActivePeriod] = useState(LayerPeriod.Default)
 
   return {
-    preLayers,
-    postLayers,
-    setPreLayers,
-    setPostLayers,
-
+    damageLayer,
+    setDamageLayer,
+    activePeriod,
+    setActivePeriod,
     dateImageMap,
     startDate,
     dateList,
