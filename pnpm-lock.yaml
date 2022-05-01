@@ -36,7 +36,7 @@ specifiers:
   next-seo: 5.4.0
   polished: 4.2.2
   prettier: 2.6.2
-  puro: 0.0.3
+  puro: 0.2.0
   react: 18.1.0
   react-dom: 18.1.0
   react-map-gl: 7.0.11
@@ -69,7 +69,7 @@ dependencies:
   next: 12.1.5_9816c66e94abfd2922f3d4095394d5a1
   next-seo: 5.4.0_45b484afb88699c8cb9235c0268a1cc5
   polished: 4.2.2
-  puro: 0.0.3
+  puro: 0.2.0
   react: 18.1.0
   react-dom: 18.1.0_react@18.1.0
   react-map-gl: 7.0.11_mapbox-gl@2.8.2+react@18.1.0
@@ -3054,8 +3054,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /puro/0.0.3:
-    resolution: {integrity: sha512-GTSY014JcPagZy0mPDCS1CPHZiFbwemdguAfYn4rUmJhFzBRgwjO7AhyspoUV61gn8GsSxGUQ0C5K4bhoJ1sxw==}
+  /puro/0.2.0:
+    resolution: {integrity: sha512-RGw8UJUpjrEGiHo+Fr3UXb8kzRv/6yvONPMP/48QLiEkEKo+ELcvP15eV853Qa9GgQNu6K0cFG3xdRGAxz2Leg==}
     hasBin: true
     dependencies:
       react: 18.1.0
