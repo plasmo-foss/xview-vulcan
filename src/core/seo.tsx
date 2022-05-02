@@ -85,7 +85,7 @@ export const FavIcon = () => {
       <link rel="shortcut icon" href="/favicons/favicon.ico" />
       <meta name="msapplication-TileColor" content={theme.colors.primary} />
       <meta name="msapplication-config" content="/favicons/browserconfig.xml" />
-      <meta name="theme-color" content={theme.colors.white} />{" "}
+      <meta name="theme-color" content={theme.colors.white} />
     </Head>
   )
 }

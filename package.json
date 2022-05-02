@@ -1,6 +1,6 @@
 {
   "name": "xview-vulcan",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "private": true,
   "scripts": {
     "dev": "next dev --port 1986",
@@ -30,6 +30,7 @@
     "d3-color": "3.1.0",
     "deck.gl": "8.7.8",
     "gl-matrix": "3.4.3",
+    "iconoir": "4.9.1",
     "iconoir-react": "4.9.1",
     "mapbox-gl": "2.8.2",
     "mapbox-gl-draw-rectangle-mode": "1.0.4",

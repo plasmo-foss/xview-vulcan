@@ -5,6 +5,10 @@ declare namespace NodeJS {
 
     PLANET_API_KEY: string
     AI_INTERNAL_ENDPOINT: string
+    AI_INTERNAL_API_KEY: string
+
+    APP_USERNAME: string
+    APP_PASSWORD: string
 
     NEXT_PUBLIC_MAPBOX_KEY: string
   }

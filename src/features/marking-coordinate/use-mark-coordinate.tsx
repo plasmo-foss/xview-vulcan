@@ -1,9 +1,39 @@
 import { Layer as GenericLayer, Position } from "@deck.gl/core"
 import { DataSet } from "@deck.gl/core/lib/layer"
-import { LineLayer, PickInfo } from "deck.gl"
+import { IconLayer, LineLayer, PickInfo } from "deck.gl"
+import startMarkerSvg from "iconoir/icons/add-pin-alt.svg"
+import endMarkerSvg from "iconoir/icons/minus-pin-alt.svg"
 import { createProvider } from "puro"
 import { useContext, useEffect, useMemo, useState } from "react"
 
+const svgToDataURL = (svg: string) =>
+  `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
+
+const createMarker = (
+  svg: {
+    src: string
+    width: number
+    height: number
+  },
+  position: Position
+) => {
+  const data = fetch(svg.src)
+    .then((resp) => resp.text())
+    .then((d) => [svgToDataURL(d)])
+  return new IconLayer<any>({
+    id: svg.src,
+    data,
+    getIcon: (d) => ({
+      url: d,
+      width: svg.width,
+      height: svg.height,
+      anchorX: svg === startMarkerSvg ? 12 : -6,
+      anchorY: 24
+    }),
+    getSize: 24,
+    getPosition: () => position
+  })
+}
 
 const useMarkCoordinateProvider = () => {
   const [startPos, setStartPos] = useState<Position>()
@@ -16,6 +46,10 @@ const useMarkCoordinateProvider = () => {
   const [lineLayer, setLineLayer] = useState<GenericLayer<Position> | null>(
     null
   )
+
+  const [startMarkerLayer, setStartMarkerLayer] = useState<IconLayer<any>>(null)
+  const [endMarkerLayer, setEndMarkerLayer] = useState<IconLayer<any>>(null)
+
   const [cursorPos, setCursorPos] = useState<Position>()
 
   const readyToSend = useMemo(
@@ -25,35 +59,38 @@ const useMarkCoordinateProvider = () => {
 
   const toggleGettingCoordinate = () => setGettingCoordinate(!gettingCoordinate)
 
+  const reset = () => {
+    setHasBoundary(false)
+    setStartPos(undefined)
+    setEndPos(undefined)
+    setLineLayer(null)
+    setStartMarkerLayer(null)
+    setEndMarkerLayer(null)
+  }
+
   const toggleStart = (e: PickInfo<any>) => {
     if (!gettingCoordinate) {
       return
     }
 
     if (!!hasBoundary) {
-      setHasBoundary(false)
-      setStartPos(undefined)
-      setEndPos(undefined)
-      setLineLayer(null)
+      reset()
       return
     }
 
-    if (!!startPos && !!endPos) {
-      setHasBoundary(true)
+    if (!!startPos) {
+      setEndPos(e.coordinate)
+      setEndMarkerLayer(createMarker(endMarkerSvg, e.coordinate))
       setGettingCoordinate(false)
       return
     }
 
     setStartPos(e.coordinate)
+    setStartMarkerLayer(createMarker(startMarkerSvg, e.coordinate))
   }
 
   const traceEnd = (e: PickInfo<any>) => {
     setCursorPos(e.coordinate)
-    if (!gettingCoordinate || !startPos || hasBoundary || !e.coordinate) {
-      return
-    }
-
-    setEndPos(e.coordinate)
   }
 
   const sendCoordinate = async () => {
@@ -68,22 +105,18 @@ const useMarkCoordinateProvider = () => {
       })
     })
 
-    setHasBoundary(false)
-    setStartPos(undefined)
-    setEndPos(undefined)
-    setLineLayer(null)
-
+    reset()
     alert("Coordinate queued for AI Assessment")
   }
 
   useEffect(() => {
-    if (!startPos || !endPos) {
+    if (!startPos || (!endPos && !cursorPos) || hasBoundary) {
       return
     }
 
     const [startLon, startLat] = startPos
 
-    const [endLon, endLat] = endPos
+    const [endLon, endLat] = endPos || cursorPos
 
     setLineLayer(
       new LineLayer({
@@ -109,14 +142,18 @@ const useMarkCoordinateProvider = () => {
         ] as DataSet<Position>
       })
     )
-  }, [startPos, endPos])
+
+    if (!!startPos && !!endPos) {
+      setHasBoundary(true)
+    }
+  }, [startPos, endPos, cursorPos, hasBoundary])
 
   return {
     sendCoordinate,
     toggleGettingCoordinate,
     toggleStart,
     traceEnd,
-    lineLayer,
+    layers: [lineLayer, startMarkerLayer, endMarkerLayer],
     cursorPos,
     endPos,
     startPos,

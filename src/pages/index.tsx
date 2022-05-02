@@ -1,15 +1,13 @@
 import { GeoJsonLayer } from "@deck.gl/layers"
 import DeckGL from "@deck.gl/react"
 import { Suggestion, Svg3DCenterBox, Svg3DRectThreePts } from "iconoir-react"
-import "mapbox-gl/dist/mapbox-gl.css"
 import type { NextPage } from "next"
 import { useState } from "react"
 import { Map } from "react-map-gl"
 
-import packageJson from "~/../package.json"
 import { ActionButton } from "~features/layouts/action-button"
 import { RightPanelContainer } from "~features/layouts/control-panel"
-import { MainContainer } from "~features/layouts/main-container"
+import { Footer, MainContainer } from "~features/layouts/main-container"
 import { CoordinateInput } from "~features/map-navigation/coordinate-input"
 import {
   MapNavigationProvider,
@@ -20,7 +18,6 @@ import {
   MarkCoordinateButton,
   SendCoordinateButton
 } from "~features/marking-coordinate/coordnate-button"
-import { StartAndEndMarkers } from "~features/marking-coordinate/map-markers"
 import {
   MarkCoordinateProvider,
   useMarkCoordinate
@@ -63,7 +60,7 @@ const Main = () => {
         //     )
         //   }
         // }}
-        layers={[damageLayer, markCoordinate.lineLayer, geoJsonLayer]}
+        layers={[damageLayer, geoJsonLayer, ...markCoordinate.layers]}
         getCursor={(s) => {
           return gettingCoordinate
             ? readyToSend
@@ -78,11 +75,9 @@ const Main = () => {
           markCoordinate.traceEnd(e)
         }}>
         <Map
-          customAttribution={`❤️☮️🤚 | www.plasmo.com | ${packageJson.name}@${packageJson.version}`}
           mapStyle="mapbox://styles/mapbox/streets-v9"
-          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_KEY}>
-          <StartAndEndMarkers />
-        </Map>
+          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_KEY}
+        />
       </DeckGL>
 
       <CoordinateInput />
@@ -124,16 +119,14 @@ const Main = () => {
                   pickable: true,
                   stroked: true,
                   filled: true,
-                  // extruded: true,
+                  extruded: true,
                   pointType: "circle",
-                  lineWidthScale: 20,
+                  lineWidthScale: 4,
                   lineWidthMinPixels: 2,
-                  getFillColor: [180, 0, 0, 200],
-                  getLineColor: [160, 0, 0, 255],
-                  // getLineColor: (d) => colorToRGBArray(d.properties.color),
-                  getPointRadius: 100,
+                  getFillColor: [180, 0, 0, 160],
+                  getLineColor: [160, 0, 0, 160],
                   getLineWidth: 1,
-                  getElevation: 1
+                  getElevation: 5
                 })
               )
             }
@@ -143,6 +136,7 @@ const Main = () => {
       </RightPanelContainer>
 
       <CoordinateInfo />
+      <Footer />
     </MainContainer>
   )
 }

@@ -29,6 +29,7 @@ specifiers:
   eslint: 8.14.0
   eslint-config-next: 12.1.5
   gl-matrix: 3.4.3
+  iconoir: 4.9.1
   iconoir-react: 4.9.1
   mapbox-gl: 2.8.2
   mapbox-gl-draw-rectangle-mode: 1.0.4
@@ -64,6 +65,7 @@ dependencies:
   d3-color: 3.1.0
   deck.gl: 8.7.8_2e925e203db80d532925c6482676d8ec
   gl-matrix: 3.4.3
+  iconoir: 4.9.1
   iconoir-react: 4.9.1_react@18.1.0
   mapbox-gl: 2.8.2
   mapbox-gl-draw-rectangle-mode: 1.0.4
@@ -2388,6 +2390,10 @@ packages:
       react: ^16.8.6 || ^17
     dependencies:
       react: 18.1.0
+    dev: false
+
+  /iconoir/4.9.1:
+    resolution: {integrity: sha512-Iz/3MwDF9ce3rIvGzTt9c/H6swTNtNp+HTorH4U8FHtsa2yykhO7e8Th+igQqLW4ioalGNCaAoO1ZGQvYeX7wg==}
     dev: false
 
   /iconv-lite/0.4.24:

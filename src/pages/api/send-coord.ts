@@ -12,6 +12,7 @@ handler.post(async (req, res) => {
   const result = await fetch(serverEndpoint, {
     method: "POST",
     headers: {
+      "Access-Key": process.env.AI_INTERNAL_API_KEY,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
