@@ -39,12 +39,11 @@ const createTilesLayer = ({ itemType = "", itemId = "" }) =>
   })
 
 const useViewDamageProvider = () => {
-  const [damageLayer, setDamageLayer] = useState<TileLayer<any>>(
-    createTilesLayer({
-      itemType: "SkySatCollect",
-      itemId: "20220407_120032_ssc6_u0001"
-    })
-  )
+  const [damageLayer, setDamageLayer] = useState<TileLayer<any>>(null)
+  // createTilesLayer({
+  //   itemType: "SkySatCollect",
+  //   itemId: "20220407_120032_ssc6_u0001"
+  // })
 
   const [activePeriod, setActivePeriod] = useState(LayerPeriod.Default)
 
