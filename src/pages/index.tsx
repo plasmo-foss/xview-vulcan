@@ -7,7 +7,11 @@ import { Map } from "react-map-gl"
 
 import { ActionButton } from "~features/layouts/action-button"
 import { RightPanelContainer } from "~features/layouts/control-panel"
-import { Footer, MainContainer } from "~features/layouts/main-container"
+import {
+  Footer,
+  MainContainer,
+  TopAttribution
+} from "~features/layouts/main-container"
 import { CoordinateInput } from "~features/map-navigation/coordinate-input"
 import {
   MapNavigationProvider,
@@ -136,6 +140,7 @@ const Main = () => {
       </RightPanelContainer>
 
       <CoordinateInfo />
+      <TopAttribution />
       <Footer />
     </MainContainer>
   )

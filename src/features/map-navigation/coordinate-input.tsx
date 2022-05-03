@@ -16,7 +16,7 @@ const CoordinateInputContainer = styled.div`
   gap: 16px;
 
   width: 100%;
-  max-width: 80vw;
+  max-width: 72vw;
 `
 
 const InputContainer = styled.div`

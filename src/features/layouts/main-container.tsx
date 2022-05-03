@@ -4,6 +4,7 @@ import Link from "next/link"
 import { rgba } from "polished"
 
 import packageJson from "~/../package.json"
+import { useViewDamage } from "~features/view-damage/use-view-damage"
 
 export const MainContainer = styled.main`
   height: 100vh;
@@ -49,12 +50,14 @@ export const FooterContainer = styled.footer`
   }
 `
 
+const currentYear = new Date().getFullYear()
+
 export const Footer = () => (
   <FooterContainer>
     <Link href="https://www.plasmo.com">
       <a target="_blank" rel="noopener noreferrer">
         <Image src="/plasmo.png" alt="Plasmo Logo" width={12} height={12} />
-        www.plasmo.com
+        {`© ${currentYear} Plasmo - www.plasmo.com`}
       </a>
     </Link>
 
@@ -63,6 +66,7 @@ export const Footer = () => (
         <span role="img">❤️☮️🤚</span>
       </a>
     </Link>
+
     <Link href="https://github.com/plasmo-foss/xview-vulcan">
       <a target="_blank" rel="noopener noreferrer">
         <Image
@@ -76,3 +80,41 @@ export const Footer = () => (
     </Link>
   </FooterContainer>
 )
+
+const TopAttributionContainer = styled(FooterContainer)`
+  top: 0px;
+  bottom: auto;
+`
+
+export const TopAttribution = () => {
+  const viewDamage = useViewDamage()
+
+  return (
+    <TopAttributionContainer as="header">
+      {viewDamage?.damageLayer ? (
+        <Link href="https://www.planet.com/">
+          <a target="_blank" rel="noopener noreferrer">
+            {`Imagery © ${currentYear} Planet Labs PBC`}
+          </a>
+        </Link>
+      ) : (
+        <Link href="https://deck.gl/">
+          <a target="_blank" rel="noopener noreferrer">
+            {`deck.gl`}
+          </a>
+        </Link>
+      )}
+      <Link href="https://www.mapbox.com/">
+        <a target="_blank" rel="noopener noreferrer">
+          {`© Mapbox`}
+        </a>
+      </Link>
+
+      <Link href="https://www.openstreetmap.org/">
+        <a target="_blank" rel="noopener noreferrer">
+          {`© Open Street Map`}
+        </a>
+      </Link>
+    </TopAttributionContainer>
+  )
+}
