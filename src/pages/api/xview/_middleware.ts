@@ -20,22 +20,13 @@ const middleware = async (req: NextRequest) => {
   }
 
   if (req.method !== ApiMethod.GET) {
-    init.body = await streamToString(req.body)
+    init.body = await req.text()
   }
 
-  return fetch(`${process.env.AI_INTERNAL_ENDPOINT}/${apiPath}`, init)
-}
-
-// https://stackoverflow.com/a/63361543/3151192
-async function streamToString(stream: ReadableStream<Uint8Array>) {
-  // lets have a ReadableStream as a stream variable
-  const chunks = []
-
-  for await (const chunk of stream as any) {
-    chunks.push(Buffer.from(chunk))
-  }
-
-  return Buffer.concat(chunks).toString("utf-8")
+  return fetch(
+    `${process.env.AI_INTERNAL_ENDPOINT}/${apiPath}${req.nextUrl.search}`,
+    init
+  )
 }
 
 export default middleware

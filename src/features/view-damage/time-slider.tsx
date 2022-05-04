@@ -115,8 +115,14 @@ const Mark = (props: any) => {
 }
 
 export const TimeSlider = () => {
-  const { dateList, max, dateImageMap, activePeriod, setActivePeriod } =
-    useViewDamage()
+  const {
+    tileSets,
+    max,
+    activeTileSet,
+    setActiveTileSet,
+    activePeriod,
+    setActivePeriod
+  } = useViewDamage()
 
   const theme = useTheme()
 
@@ -124,14 +130,19 @@ export const TimeSlider = () => {
     <SliderContainer>
       <ReactSlider
         onChange={([preIndex, postIndex]: number[]) => {
-          const preDate = dateList[preIndex]
-          const postDate = dateList[postIndex]
-          // console.log(preDate, postDate)
+          if (activePeriod === LayerPeriod.Default) {
+            return
+          }
+          const tileSet =
+            activePeriod === LayerPeriod.Pre
+              ? tileSets[preIndex]
+              : tileSets[postIndex]
 
-          // console.log(dateImageMap[postDate.toISOString()])
+          if (activeTileSet.timestamp === tileSet.timestamp) {
+            return
+          }
 
-          const postData = dateImageMap[postDate.toISOString()]
-          const preData = dateImageMap[preDate.toISOString()]
+          setActiveTileSet(tileSet)
         }}
         className="slider"
         thumbClassName="thumb"
@@ -146,13 +157,18 @@ export const TimeSlider = () => {
         orientation="vertical"
         invert
         renderMark={(props) => (
-          <Mark {...props} date={dateList[props.key].toDateString()} />
+          <Mark
+            {...props}
+            date={new Date(tileSets[props.key].timestamp).toDateString()}
+          />
         )}
         renderThumb={(props, state) => {
           const label = props["aria-label"] as LayerPeriod
 
           const isPre = label === LayerPeriod.Pre
           const isActive = label === activePeriod
+
+          const tileSet = tileSets[state.valueNow]
 
           return (
             <div
@@ -165,12 +181,18 @@ export const TimeSlider = () => {
                 color: isActive ? theme.colors.white : theme.colors.darkPrimary
               }}
               onClick={() =>
-                setActivePeriod((c) =>
-                  c === label ? LayerPeriod.Default : label
-                )
+                setActivePeriod((c) => {
+                  const isEnabled = c === label
+
+                  setActiveTileSet(isEnabled ? null : tileSet)
+
+                  return isEnabled ? LayerPeriod.Default : label
+                })
               }>
               {isPre ? <KeyframePosition /> : <Keyframe />}
-              <Timestamp>{dateList[state.valueNow].toDateString()}</Timestamp>
+              <Timestamp>
+                {new Date(tileSet.timestamp).toDateString()}
+              </Timestamp>
             </div>
           )
         }}

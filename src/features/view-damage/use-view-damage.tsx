@@ -1,13 +1,17 @@
 import { TileLayer } from "@deck.gl/geo-layers"
 import { BitmapLayer } from "@deck.gl/layers"
 import { createProvider } from "puro"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useMemo, useState } from "react"
 import { useHashedState } from "use-hashed-state"
 
-import { callXViewApi } from "~core/xview-api"
+import {
+  XViewApiFetchPlanetImageryResponse,
+  XViewTileSet,
+  callXViewApi
+} from "~core/xview-api"
 import { useMarkCoordinate } from "~features/marking-coordinate/use-mark-coordinate"
 
-import { dateImageMap, dateList, max, startDate } from "./mock-data"
+import { dateImageMap, dateList } from "./mock-data"
 
 export enum LayerPeriod {
   Default = "default",
@@ -48,12 +52,12 @@ const useViewDamageProvider = () => {
   const [jobId, setJobId] = useHashedState("job-id", "")
 
   const [damageLayer, setDamageLayer] = useState<TileLayer<any>>(null)
-  // createTilesLayer({
-  //   itemType: "SkySatCollect",
-  //   itemId: "20220407_120032_ssc6_u0001"
-  // })
 
   const [activePeriod, setActivePeriod] = useState(LayerPeriod.Default)
+
+  const [activeTileSet, setActiveTileSet] = useState<XViewTileSet>(null)
+
+  const [tileSets, setTileSets] = useState<Array<XViewTileSet>>([])
 
   useEffect(() => {
     if (!readyToSend || !startPos || !endPos) {
@@ -80,23 +84,43 @@ const useViewDamageProvider = () => {
     }
 
     async function fetchPlanetImagery() {
-      // const data = await callXViewApi("/fetch-planet-imagery", {
-      //   current_date: new Date().toISOString(),
-      //   job_id: jobId
-      // }).then((resp) => resp.json())
-      // console.log(data)
+      const data: XViewApiFetchPlanetImageryResponse = await callXViewApi(
+        "/fetch-planet-imagery",
+        {
+          job_id: jobId
+        }
+      ).then((resp) => resp.json())
+
+      setTileSets(data.images.reverse())
     }
 
     fetchPlanetImagery()
   }, [jobId])
 
+  useEffect(() => {
+    if (!activeTileSet) {
+      setDamageLayer(null)
+      return
+    }
+
+    setDamageLayer(
+      createTilesLayer({
+        itemType: activeTileSet.item_type,
+        itemId: activeTileSet.item_id
+      })
+    )
+  }, [activeTileSet])
+
+  const max = useMemo(() => (tileSets?.length || 1) - 1, [tileSets])
+
   return {
+    activeTileSet,
+    setActiveTileSet,
     damageLayer,
-    setDamageLayer,
     activePeriod,
     setActivePeriod,
     dateImageMap,
-    startDate,
+    tileSets,
     dateList,
     max
   }

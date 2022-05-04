@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
 
+const publicPathList = ["favicons"]
+
+const publicPathSet = new Set(publicPathList)
+
 export function middleware(req: NextRequest) {
+  const pathName = req.nextUrl.pathname.split("/")[1]
+  if (publicPathSet.has(pathName)) {
+    return NextResponse.next()
+  }
+
   const basicAuth = req.headers.get("authorization")
 
   if (basicAuth) {
     const auth = basicAuth.split(" ")[1]
-    const [user, pwd] = Buffer.from(auth, "base64").toString().split(":")
+    const [user, pwd] = atob(auth).split(":")
 
     if (user === process.env.APP_USERNAME && pwd === process.env.APP_PASSWORD) {
       return NextResponse.next()

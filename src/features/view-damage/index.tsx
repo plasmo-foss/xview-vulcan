@@ -2,14 +2,18 @@ import { KeyframeAlignVertical, RemoveKeyframeAlt } from "iconoir-react"
 import { useState } from "react"
 
 import { TimeSlider, ToggleSliderButton } from "./time-slider"
+import { useViewDamage } from "./use-view-damage"
 
 export const ViewDamagePanel = () => {
   const [showSlider, setShowSlider] = useState(true)
+  const { tileSets } = useViewDamage()
+
+  if (tileSets.length === 0) {
+    return null
+  }
 
   return (
     <>
-      {showSlider && <TimeSlider />}
-
       <ToggleSliderButton
         title="Toggle Slider"
         active={showSlider}
@@ -18,6 +22,8 @@ export const ViewDamagePanel = () => {
         }}>
         {showSlider ? <RemoveKeyframeAlt /> : <KeyframeAlignVertical />}
       </ToggleSliderButton>
+
+      {showSlider && <TimeSlider />}
     </>
   )
 }
