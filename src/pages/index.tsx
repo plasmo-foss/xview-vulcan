@@ -1,6 +1,11 @@
 import { GeoJsonLayer } from "@deck.gl/layers"
 import DeckGL from "@deck.gl/react"
-import { Suggestion, Svg3DCenterBox, Svg3DRectThreePts } from "iconoir-react"
+import {
+  Suggestion,
+  Svg3DCenterBox,
+  Svg3DEllipseThreePts,
+  Svg3DRectThreePts
+} from "iconoir-react"
 import type { NextPage } from "next"
 import { useState } from "react"
 import { Map } from "react-map-gl"
@@ -73,10 +78,10 @@ const Main = () => {
             : "auto"
         }}
         onClick={(e) => {
-          markCoordinate.toggleStart(e)
+          markCoordinate.toggleMarker(e)
         }}
         onHover={(e) => {
-          markCoordinate.traceEnd(e)
+          markCoordinate.setCursorPos(e.coordinate)
         }}>
         <Map
           mapStyle="mapbox://styles/mapbox/streets-v9"
@@ -96,12 +101,11 @@ const Main = () => {
           }}>
           <Svg3DRectThreePts />
         </MarkCoordinateButton>
-
         <SendCoordinateButton
           title="Mark for ML Assessment Queue"
           disabled={!readyToSend}
           onClick={() => {
-            markCoordinate.sendCoordinate()
+            // markCoordinate.sendCoordinate()
           }}>
           <Suggestion />
         </SendCoordinateButton>
@@ -136,6 +140,15 @@ const Main = () => {
             }
           }}>
           <Svg3DCenterBox />
+        </ActionButton>
+
+        <ActionButton
+          title="Reset Bearing and Pitch"
+          onClick={() => {
+            setBearing(0)
+            setPitch(0)
+          }}>
+          <Svg3DEllipseThreePts />
         </ActionButton>
       </RightPanelContainer>
 

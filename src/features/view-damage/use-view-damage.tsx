@@ -1,7 +1,11 @@
 import { TileLayer } from "@deck.gl/geo-layers"
 import { BitmapLayer } from "@deck.gl/layers"
 import { createProvider } from "puro"
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
+import { useHashedState } from "use-hashed-state"
+
+import { callXViewApi } from "~core/xview-api"
+import { useMarkCoordinate } from "~features/marking-coordinate/use-mark-coordinate"
 
 import { dateImageMap, dateList, max, startDate } from "./mock-data"
 
@@ -39,6 +43,10 @@ const createTilesLayer = ({ itemType = "", itemId = "" }) =>
   })
 
 const useViewDamageProvider = () => {
+  const { startPos, endPos, readyToSend } = useMarkCoordinate()
+
+  const [jobId, setJobId] = useHashedState("job-id", "")
+
   const [damageLayer, setDamageLayer] = useState<TileLayer<any>>(null)
   // createTilesLayer({
   //   itemType: "SkySatCollect",
@@ -46,6 +54,41 @@ const useViewDamageProvider = () => {
   // })
 
   const [activePeriod, setActivePeriod] = useState(LayerPeriod.Default)
+
+  useEffect(() => {
+    if (!readyToSend || !startPos || !endPos) {
+      return
+    }
+
+    async function sendCoordinates() {
+      const newJobId = await callXViewApi("/send-coordinates", {
+        start_lon: startPos[0],
+        start_lat: startPos[1],
+        end_lon: endPos[0],
+        end_lat: endPos[1]
+      }).then((resp) => resp.json())
+
+      setJobId(newJobId)
+    }
+
+    sendCoordinates()
+  }, [startPos, endPos, readyToSend, setJobId])
+
+  useEffect(() => {
+    if (!jobId) {
+      return
+    }
+
+    async function fetchPlanetImagery() {
+      // const data = await callXViewApi("/fetch-planet-imagery", {
+      //   current_date: new Date().toISOString(),
+      //   job_id: jobId
+      // }).then((resp) => resp.json())
+      // console.log(data)
+    }
+
+    fetchPlanetImagery()
+  }, [jobId])
 
   return {
     damageLayer,
@@ -61,6 +104,9 @@ const useViewDamageProvider = () => {
 
 const { BaseContext, Provider } = createProvider(useViewDamageProvider)
 
+/**
+ * Must be child of MarkCoordinateProvider
+ */
 export const ViewDamageProvider = Provider
 
 export const useViewDamage = () => useContext(BaseContext)

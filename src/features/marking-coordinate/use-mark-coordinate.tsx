@@ -68,7 +68,7 @@ const useMarkCoordinateProvider = () => {
     setEndMarkerLayer(null)
   }
 
-  const toggleStart = (e: PickInfo<any>) => {
+  const toggleMarker = (e: PickInfo<any>) => {
     if (!gettingCoordinate) {
       return
     }
@@ -87,26 +87,6 @@ const useMarkCoordinateProvider = () => {
 
     setStartPos(e.coordinate)
     setStartMarkerLayer(createMarker(startMarkerSvg, e.coordinate))
-  }
-
-  const traceEnd = (e: PickInfo<any>) => {
-    setCursorPos(e.coordinate)
-  }
-
-  const sendCoordinate = async () => {
-    await fetch("/api/send-coord", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        startPos,
-        endPos
-      })
-    })
-
-    reset()
-    alert("Coordinate queued for AI Assessment")
   }
 
   useEffect(() => {
@@ -149,10 +129,9 @@ const useMarkCoordinateProvider = () => {
   }, [startPos, endPos, cursorPos, hasBoundary])
 
   return {
-    sendCoordinate,
     toggleGettingCoordinate,
-    toggleStart,
-    traceEnd,
+    toggleMarker,
+    setCursorPos,
     layers: [lineLayer, startMarkerLayer, endMarkerLayer],
     cursorPos,
     endPos,

@@ -34,7 +34,6 @@
     "mapbox-gl": "2.8.2",
     "mapbox-gl-draw-rectangle-mode": "1.0.4",
     "next": "12.1.6",
-    "next-connect": "0.12.2",
     "next-seo": "5.4.0",
     "query-string": "7.1.1",
     "polished": "4.2.2",
