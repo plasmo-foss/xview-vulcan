@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "author": "AAAAC3NzaC1lZDI1NTE5AAAAIPbZ7O3tNdGlcubuv9d16RRAxt/U64eCftcNBXxHZRu3",
+  "packageManager": "pnpm@7.0.0",
   "dependencies": {
     "@deck.gl/core": "8.7.8",
     "@deck.gl/layers": "8.7.8",
