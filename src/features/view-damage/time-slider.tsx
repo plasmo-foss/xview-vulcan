@@ -40,9 +40,10 @@ const SliderContainer = styled.div`
     }
     .mark {
       width: 16px;
-      height: 16px;
+      height: 8px;
+      /* border-radius: 100%; */
+
       margin-bottom: 22px;
-      border-radius: 100%;
       background: ${(p) => p.theme.colors.white};
       transition: 0.2s ease-in-out;
       position: relative;
