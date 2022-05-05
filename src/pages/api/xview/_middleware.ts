@@ -11,6 +11,8 @@ const middleware = async (req: NextRequest) => {
     })
   }
 
+  console.log(`[XVIEW] ${req.method} ${req.url}`)
+
   const init: RequestInit = {
     method: req.method,
     headers: {
@@ -22,6 +24,8 @@ const middleware = async (req: NextRequest) => {
   if (req.method !== ApiMethod.GET) {
     init.body = await req.text()
   }
+
+  console.log(`[XVIEW] `, init.body)
 
   return fetch(
     `${process.env.AI_INTERNAL_ENDPOINT}/${apiPath}${req.nextUrl.search}`,
