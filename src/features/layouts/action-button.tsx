@@ -28,3 +28,14 @@ export const ActionButton = styled.button<{
     transform: scale(1.1);
   }
 `
+
+export const PrimaryButton = styled(ActionButton)`
+  background: ${(p) =>
+    p.disabled ? p.theme.colors.gray : p.theme.colors.darkPrimary};
+  color: ${(p) => p.theme.colors.white};
+
+  &:hover {
+    background: ${(p) =>
+      p.disabled ? p.theme.colors.gray : p.theme.colors.subtleGray};
+  }
+`

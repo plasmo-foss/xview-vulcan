@@ -1,13 +1,14 @@
 import { TileLayer } from "@deck.gl/geo-layers"
 import { BitmapLayer } from "@deck.gl/layers"
 import { createProvider } from "puro"
-import { useContext, useEffect, useMemo, useState } from "react"
+import { useCallback, useContext, useEffect, useMemo, useState } from "react"
 
 import {
   XViewApiFetchPlanetImageryResponse,
   XViewTileSet,
   callXViewApi
 } from "~core/xview-api"
+import { useStatusUpdate } from "~features/layouts/use-status-update"
 import { useMarkCoordinate } from "~features/marking-coordinate/use-mark-coordinate"
 
 import { dateImageMap, dateList } from "./mock-data"
@@ -46,9 +47,11 @@ const createTilesLayer = ({ itemType = "", itemId = "" }) =>
   })
 
 const useViewDamageProvider = () => {
-  const { startPos, endPos, readyToSend } = useMarkCoordinate()
+  const { setStatus } = useStatusUpdate()
+  const { startPos, endPos, hasBoundary } = useMarkCoordinate()
 
   const [jobId, setJobId] = useState("")
+  const [assessmentId, setAssessmentId] = useState("")
 
   const [damageLayer, setDamageLayer] = useState<TileLayer<any>>(null)
 
@@ -61,11 +64,12 @@ const useViewDamageProvider = () => {
   const [tileSets, setTileSets] = useState<Array<XViewTileSet>>([])
 
   useEffect(() => {
-    if (!readyToSend || !startPos || !endPos) {
+    if (!hasBoundary || !startPos || !endPos) {
       return
     }
 
     async function sendCoordinates() {
+      setStatus("Sending start and end coordinates...")
       const newJobId = await callXViewApi("/send-coordinates", {
         start_lon: startPos[0],
         start_lat: startPos[1],
@@ -77,7 +81,7 @@ const useViewDamageProvider = () => {
     }
 
     sendCoordinates()
-  }, [startPos, endPos, readyToSend, setJobId])
+  }, [startPos, endPos, hasBoundary, setJobId, setStatus])
 
   useEffect(() => {
     if (!jobId) {
@@ -85,6 +89,7 @@ const useViewDamageProvider = () => {
     }
 
     async function fetchPlanetImagery() {
+      setStatus("Fetching planet imagery...")
       const data: XViewApiFetchPlanetImageryResponse = await callXViewApi(
         "/fetch-planet-imagery",
         {
@@ -92,11 +97,17 @@ const useViewDamageProvider = () => {
         }
       ).then((resp) => resp.json())
 
-      setTileSets(data.images.reverse())
+      const tileSets = data.images.reverse()
+
+      setStatus(null)
+
+      setTileSets(tileSets)
+      setPreTileSet(tileSets[0])
+      setPostTileSet(tileSets[tileSets.length - 1])
     }
 
     fetchPlanetImagery()
-  }, [jobId])
+  }, [jobId, setStatus])
 
   useEffect(() => {
     if (!activeTileSet) {
@@ -125,11 +136,30 @@ const useViewDamageProvider = () => {
     setActiveTileSet(tileSet)
   }, [preTileSet, postTileSet, activePeriod, activeTileSet])
 
+  const launchAssessment = useCallback(async () => {
+    const data = await callXViewApi("/launch-assessment", {
+      job_id: jobId,
+      pre_image_id: preTileSet.item_id,
+      post_image_id: postTileSet.item_id
+    }).then((resp) => resp.json())
+
+    console.log(data)
+    setAssessmentId(data)
+  }, [jobId, preTileSet, postTileSet])
+
   const max = useMemo(() => (tileSets?.length || 1) - 1, [tileSets])
 
   return {
+    assessmentId,
+
+    jobId,
+    preTileSet,
+    postTileSet,
+
     setPreTileSet,
     setPostTileSet,
+
+    launchAssessment,
 
     activeTileSet,
     setActiveTileSet,

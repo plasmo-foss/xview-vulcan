@@ -2,6 +2,7 @@ import styled from "@emotion/styled"
 import { AddPinAlt, CursorPointer, MinusPinAlt } from "iconoir-react"
 import { rgba } from "polished"
 
+import { useStatusUpdate } from "~features/layouts/use-status-update"
 import { useMarkCoordinate } from "~features/marking-coordinate/use-mark-coordinate"
 
 const CoordinateInfoContainer = styled.div`
@@ -28,8 +29,10 @@ const CoordinateInfoContainer = styled.div`
 
 const CoordinateGroup = styled.div`
   display: flex;
-  justify-content: left;
+  justify-content: right;
   align-items: center;
+
+  width: 180px;
 
   gap: 8px;
   transition: 0.2s ease-in-out;
@@ -44,9 +47,11 @@ const CoordinateGroup = styled.div`
 
 export const CoordinateInfo = () => {
   const { endPos, startPos, cursorPos } = useMarkCoordinate()
+  const { status } = useStatusUpdate()
 
   return (
     <CoordinateInfoContainer>
+      {status && <CoordinateGroup>{status}</CoordinateGroup>}
       {endPos && (
         <CoordinateGroup>
           <div>

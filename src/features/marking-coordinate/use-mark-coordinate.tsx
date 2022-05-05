@@ -4,7 +4,7 @@ import { IconLayer, LineLayer, PickInfo } from "deck.gl"
 import startMarkerSvg from "iconoir/icons/add-pin-alt.svg"
 import endMarkerSvg from "iconoir/icons/minus-pin-alt.svg"
 import { createProvider } from "puro"
-import { useContext, useEffect, useMemo, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 
 const svgToDataURL = (svg: string) =>
   `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
@@ -51,11 +51,6 @@ const useMarkCoordinateProvider = () => {
   const [endMarkerLayer, setEndMarkerLayer] = useState<IconLayer<any>>(null)
 
   const [cursorPos, setCursorPos] = useState<Position>()
-
-  const readyToSend = useMemo(
-    () => !!lineLayer && hasBoundary,
-    [lineLayer, hasBoundary]
-  )
 
   const toggleGettingCoordinate = () => setGettingCoordinate(!gettingCoordinate)
 
@@ -129,6 +124,7 @@ const useMarkCoordinateProvider = () => {
   }, [startPos, endPos, cursorPos, hasBoundary])
 
   return {
+    hasBoundary,
     toggleGettingCoordinate,
     toggleMarker,
     setCursorPos,
@@ -136,7 +132,6 @@ const useMarkCoordinateProvider = () => {
     cursorPos,
     endPos,
     startPos,
-    readyToSend,
     gettingCoordinate
   }
 }

@@ -1,11 +1,6 @@
 import { GeoJsonLayer } from "@deck.gl/layers"
 import DeckGL from "@deck.gl/react"
-import {
-  Suggestion,
-  Svg3DCenterBox,
-  Svg3DEllipseThreePts,
-  Svg3DRectThreePts
-} from "iconoir-react"
+import { Svg3DCenterBox, Svg3DEllipseThreePts } from "iconoir-react"
 import type { NextPage } from "next"
 import { useState } from "react"
 import { Map } from "react-map-gl"
@@ -17,6 +12,7 @@ import {
   MainContainer,
   TopAttribution
 } from "~features/layouts/main-container"
+import { StatusUpdateProvider } from "~features/layouts/use-status-update"
 import { CoordinateInput } from "~features/map-navigation/coordinate-input"
 import {
   MapNavigationProvider,
@@ -42,7 +38,7 @@ const Main = () => {
     useMapNavigation()
 
   const markCoordinate = useMarkCoordinate()
-  const { gettingCoordinate, readyToSend } = markCoordinate
+  const { gettingCoordinate, hasBoundary } = markCoordinate
 
   const { damageLayer } = useViewDamage()
 
@@ -72,7 +68,7 @@ const Main = () => {
         layers={[damageLayer, geoJsonLayer, ...markCoordinate.layers]}
         getCursor={(s) => {
           return gettingCoordinate
-            ? readyToSend
+            ? hasBoundary
               ? "not-allowed"
               : "crosshair"
             : "auto"
@@ -93,22 +89,8 @@ const Main = () => {
       <ViewDamagePanel />
 
       <RightPanelContainer>
-        <MarkCoordinateButton
-          title="Get Coordinate"
-          active={gettingCoordinate}
-          onClick={() => {
-            markCoordinate.toggleGettingCoordinate()
-          }}>
-          <Svg3DRectThreePts />
-        </MarkCoordinateButton>
-        <SendCoordinateButton
-          title="Mark for ML Assessment Queue"
-          disabled={!readyToSend}
-          onClick={() => {
-            // markCoordinate.sendCoordinate()
-          }}>
-          <Suggestion />
-        </SendCoordinateButton>
+        <MarkCoordinateButton />
+        <SendCoordinateButton />
 
         <ActionButton
           title="Toggle GeoJSON"
@@ -160,13 +142,15 @@ const Main = () => {
 }
 
 const IndexPage: NextPage = () => (
-  <MapNavigationProvider>
-    <MarkCoordinateProvider>
-      <ViewDamageProvider>
-        <Main />
-      </ViewDamageProvider>
-    </MarkCoordinateProvider>
-  </MapNavigationProvider>
+  <StatusUpdateProvider>
+    <MapNavigationProvider>
+      <MarkCoordinateProvider>
+        <ViewDamageProvider>
+          <Main />
+        </ViewDamageProvider>
+      </MarkCoordinateProvider>
+    </MapNavigationProvider>
+  </StatusUpdateProvider>
 )
 
 export default IndexPage
