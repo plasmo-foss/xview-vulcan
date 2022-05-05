@@ -4,11 +4,6 @@ import qs from "query-string"
 import { ApiMethod, xviewApiSet } from "~core/xview-api"
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  res.setHeader(
-    "Cache-Control",
-    "public, s-maxage=30, stale-while-revalidate=59"
-  )
-
   const { slug, ...query } = req.query
 
   if (!xviewApiSet.has(`/${slug}`)) {
