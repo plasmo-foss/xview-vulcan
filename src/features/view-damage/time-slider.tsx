@@ -192,7 +192,7 @@ export const TimeSlider = () => {
               }>
               {isPre ? <KeyframePosition /> : <Keyframe />}
               <Timestamp>
-                {new Date(tileSet.timestamp).toDateString()}
+                {new Date(tileSet?.timestamp).toDateString()}
               </Timestamp>
             </div>
           )
