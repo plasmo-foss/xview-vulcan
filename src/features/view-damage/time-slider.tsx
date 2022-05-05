@@ -117,9 +117,12 @@ const Mark = (props: any) => {
 
 export const TimeSlider = () => {
   const {
+    setPostTileSet,
+    setPreTileSet,
+
     tileSets,
     max,
-    activeTileSet,
+
     setActiveTileSet,
     activePeriod,
     setActivePeriod
@@ -131,19 +134,8 @@ export const TimeSlider = () => {
     <SliderContainer>
       <ReactSlider
         onChange={([preIndex, postIndex]: number[]) => {
-          if (activePeriod === LayerPeriod.Default) {
-            return
-          }
-          const tileSet =
-            activePeriod === LayerPeriod.Pre
-              ? tileSets[preIndex]
-              : tileSets[postIndex]
-
-          if (activeTileSet.timestamp === tileSet.timestamp) {
-            return
-          }
-
-          setActiveTileSet(tileSet)
+          setPreTileSet(tileSets[preIndex])
+          setPostTileSet(tileSets[postIndex])
         }}
         className="slider"
         thumbClassName="thumb"

@@ -2,7 +2,6 @@ import { TileLayer } from "@deck.gl/geo-layers"
 import { BitmapLayer } from "@deck.gl/layers"
 import { createProvider } from "puro"
 import { useContext, useEffect, useMemo, useState } from "react"
-import { useHashedState } from "use-hashed-state"
 
 import {
   XViewApiFetchPlanetImageryResponse,
@@ -49,13 +48,15 @@ const createTilesLayer = ({ itemType = "", itemId = "" }) =>
 const useViewDamageProvider = () => {
   const { startPos, endPos, readyToSend } = useMarkCoordinate()
 
-  const [jobId, setJobId] = useHashedState("job-id", "")
+  const [jobId, setJobId] = useState("")
 
   const [damageLayer, setDamageLayer] = useState<TileLayer<any>>(null)
 
   const [activePeriod, setActivePeriod] = useState(LayerPeriod.Default)
 
   const [activeTileSet, setActiveTileSet] = useState<XViewTileSet>(null)
+  const [preTileSet, setPreTileSet] = useState<XViewTileSet>(null)
+  const [postTileSet, setPostTileSet] = useState<XViewTileSet>(null)
 
   const [tileSets, setTileSets] = useState<Array<XViewTileSet>>([])
 
@@ -111,9 +112,25 @@ const useViewDamageProvider = () => {
     )
   }, [activeTileSet])
 
+  useEffect(() => {
+    if (activePeriod === LayerPeriod.Default) {
+      return
+    }
+    const tileSet = activePeriod === LayerPeriod.Pre ? preTileSet : postTileSet
+
+    if (activeTileSet?.timestamp === tileSet.timestamp) {
+      return
+    }
+
+    setActiveTileSet(tileSet)
+  }, [preTileSet, postTileSet, activePeriod, activeTileSet])
+
   const max = useMemo(() => (tileSets?.length || 1) - 1, [tileSets])
 
   return {
+    setPreTileSet,
+    setPostTileSet,
+
     activeTileSet,
     setActiveTileSet,
     damageLayer,
