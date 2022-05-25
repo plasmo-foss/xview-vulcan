@@ -2,11 +2,13 @@ import { TileLayer } from "@deck.gl/geo-layers"
 import { BitmapLayer } from "@deck.gl/layers"
 import { createProvider } from "puro"
 import { useCallback, useContext, useEffect, useMemo, useState } from "react"
+import { useHashedState } from "use-hashed-state"
 
 import {
   XViewApiFetchPlanetImageryResponse,
   XViewTileSet,
-  callXViewApi
+  callXViewAPI,
+  useXViewAPI
 } from "~core/xview-api"
 import { useStatusUpdate } from "~features/layouts/use-status-update"
 import { useMarkCoordinate } from "~features/marking-coordinate/use-mark-coordinate"
@@ -50,8 +52,10 @@ const useViewDamageProvider = () => {
   const { setStatus } = useStatusUpdate()
   const { startPos, endPos, hasBoundary } = useMarkCoordinate()
 
+  const [pollingJobId, setPollingJobId] = useHashedState("job-id", "")
+  const [assessmentId, setAssessmentId] = useHashedState("assessment-id", "")
+
   const [jobId, setJobId] = useState("")
-  const [assessmentId, setAssessmentId] = useState("")
 
   const [damageLayer, setDamageLayer] = useState<TileLayer<any>>(null)
 
@@ -63,6 +67,12 @@ const useViewDamageProvider = () => {
 
   const [tileSets, setTileSets] = useState<Array<XViewTileSet>>([])
 
+  const { data: pollingStatus, error: pollingError } = useXViewAPI<{
+    status: string
+  }>(pollingJobId ? `/job-status` : null, {
+    job_id: pollingJobId
+  })
+
   useEffect(() => {
     if (!hasBoundary || !startPos || !endPos) {
       return
@@ -70,12 +80,12 @@ const useViewDamageProvider = () => {
 
     async function sendCoordinates() {
       setStatus("Sending start and end coordinates...")
-      const newJobId = await callXViewApi("/send-coordinates", {
+      const newJobId = await callXViewAPI("/send-coordinates", {
         start_lon: startPos[0],
         start_lat: startPos[1],
         end_lon: endPos[0],
         end_lat: endPos[1]
-      }).then((resp) => resp.json())
+      }).json<string>()
 
       setJobId(newJobId)
     }
@@ -90,20 +100,24 @@ const useViewDamageProvider = () => {
 
     async function fetchPlanetImagery() {
       setStatus("Fetching planet imagery...")
-      const data: XViewApiFetchPlanetImageryResponse = await callXViewApi(
-        "/fetch-planet-imagery",
-        {
-          job_id: jobId
-        }
-      ).then((resp) => resp.json())
+      try {
+        const data: XViewApiFetchPlanetImageryResponse = await callXViewAPI(
+          "/fetch-planet-imagery",
+          {
+            job_id: jobId
+          }
+        ).json()
 
-      const tileSets = data.images.reverse()
+        const tileSets = data.images.reverse()
 
-      setStatus(null)
+        setStatus(null)
 
-      setTileSets(tileSets)
-      setPreTileSet(tileSets[0])
-      setPostTileSet(tileSets[tileSets.length - 1])
+        setTileSets(tileSets)
+        setPreTileSet(tileSets[0])
+        setPostTileSet(tileSets[tileSets.length - 1])
+      } catch (error) {
+        setStatus("Cannot fetch tileset. Please try again.")
+      }
     }
 
     fetchPlanetImagery()
@@ -137,19 +151,40 @@ const useViewDamageProvider = () => {
   }, [preTileSet, postTileSet, activePeriod, activeTileSet])
 
   const launchAssessment = useCallback(async () => {
-    const data = await callXViewApi("/launch-assessment", {
+    setPollingJobId(jobId)
+
+    const data = await callXViewAPI("/launch-assessment", {
       job_id: jobId,
       pre_image_id: preTileSet.item_id,
       post_image_id: postTileSet.item_id
-    }).then((resp) => resp.json())
+    }).json<string>()
 
-    console.log(data)
     setAssessmentId(data)
-  }, [jobId, preTileSet, postTileSet])
+  }, [
+    jobId,
+    preTileSet?.item_id,
+    postTileSet?.item_id,
+    setStatus,
+    setPollingJobId,
+    setAssessmentId
+  ])
+
+  useEffect(() => {
+    console.log(pollingStatus)
+
+    if (!pollingStatus || pollingStatus.status !== "done") {
+      return
+    }
+
+    console.log("Polling done")
+  }, [pollingStatus, pollingStatus?.status])
 
   const max = useMemo(() => (tileSets?.length || 1) - 1, [tileSets])
 
   return {
+    pollingJobId,
+    pollingStatus,
+    pollingError,
     assessmentId,
 
     jobId,

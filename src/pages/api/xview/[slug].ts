@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import qs from "query-string"
 
-import { ApiMethod, xviewApiSet } from "~core/xview-api"
+import { APIMethod, xviewApiSet } from "~core/xview-api"
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { slug, ...query } = req.query
@@ -19,8 +19,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   switch (req.method) {
-    case ApiMethod.POST:
-    case ApiMethod.PUT:
+    case APIMethod.POST:
+    case APIMethod.PUT:
       init.body = req.body
       break
   }

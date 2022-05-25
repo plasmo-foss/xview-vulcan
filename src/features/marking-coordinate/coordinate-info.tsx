@@ -4,6 +4,7 @@ import { rgba } from "polished"
 
 import { useStatusUpdate } from "~features/layouts/use-status-update"
 import { useMarkCoordinate } from "~features/marking-coordinate/use-mark-coordinate"
+import { useViewDamage } from "~features/view-damage/use-view-damage"
 
 const CoordinateInfoContainer = styled.div`
   pointer-events: none;
@@ -49,8 +50,13 @@ export const CoordinateInfo = () => {
   const { endPos, startPos, cursorPos } = useMarkCoordinate()
   const { status } = useStatusUpdate()
 
+  const { pollingJobId, pollingError, pollingStatus } = useViewDamage()
+
   return (
     <CoordinateInfoContainer>
+      {!pollingError && pollingStatus && (
+        <CoordinateGroup>{`${pollingJobId}: ${pollingStatus?.status}`}</CoordinateGroup>
+      )}
       {status && <CoordinateGroup>{status}</CoordinateGroup>}
       {endPos && (
         <CoordinateGroup>

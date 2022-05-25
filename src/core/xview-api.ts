@@ -1,24 +1,27 @@
+import ky, { Options } from "ky"
 import qs from "query-string"
+import useSWR from "swr"
 
-export enum ApiMethod {
+export enum APIMethod {
   GET = "GET",
   POST = "POST",
   PUT = "PUT",
   DELETE = "DELETE"
 }
 
-const xviewApiMap = {
-  "/fetch-coordinates": ApiMethod.GET,
-  "/job-status": ApiMethod.GET,
-  "/fetch-osm-polygons": ApiMethod.GET,
+const xviewAPIMap = {
+  "/fetch-coordinates": APIMethod.GET,
+  "/job-status": APIMethod.GET,
+  "/fetch-osm-polygons": APIMethod.GET,
 
-  "/send-coordinates": ApiMethod.POST,
-  "/search-osm-polygons": ApiMethod.POST,
-  "/fetch-planet-imagery": ApiMethod.POST,
-  "/launch-assessment": ApiMethod.POST
+  "/send-coordinates": APIMethod.POST,
+  "/search-osm-polygons": APIMethod.POST,
+  "/fetch-planet-imagery": APIMethod.POST,
+  "/launch-assessment": APIMethod.POST,
+  "/fetch-assessment": APIMethod.POST
 }
 
-type XViewApiPath = keyof typeof xviewApiMap
+type XViewAPIPath = keyof typeof xviewAPIMap
 
 export type XViewTileSet = {
   timestamp: string
@@ -31,26 +34,43 @@ export type XViewApiFetchPlanetImageryResponse = {
   images: Array<XViewTileSet>
 }
 
-export const xviewApiSet = new Set(Object.keys(xviewApiMap))
+export const xviewApiSet = new Set(Object.keys(xviewAPIMap))
 
-export const callXViewApi = <T>(
-  path: XViewApiPath,
+export const callXViewAPI = (
+  path: XViewAPIPath,
   payload?: Record<string, string | number | boolean | object>,
-  initOveride = {} as RequestInit
+  options = {
+    retry: {
+      limit: 5,
+      methods: ["GET", "POST"],
+      statusCodes: [408, 500, 502, 503, 504],
+      maxRetryAfter: undefined
+    },
+    timeout: false
+  } as Options
 ) => {
-  const method = xviewApiMap[path]
+  const method = xviewAPIMap[path]
   switch (method) {
-    case ApiMethod.POST:
-    case ApiMethod.PUT:
-      return fetch(`/api/xview${path}`, {
-        method: xviewApiMap[path],
+    case APIMethod.POST:
+    case APIMethod.PUT:
+      return ky(`/api/xview${path}`, {
+        method: xviewAPIMap[path],
         ...(payload && { body: JSON.stringify(payload) }),
-        ...initOveride
+        ...options
       })
     default:
-      return fetch(`/api/xview${path}?${qs.stringify(payload)}`, {
-        method: xviewApiMap[path],
-        ...initOveride
+      return ky(`/api/xview${path}?${qs.stringify(payload)}`, {
+        method: xviewAPIMap[path],
+        ...options
       })
   }
 }
+
+export const useXViewAPI = <T>(
+  path: XViewAPIPath,
+  payload?: Record<string, string | number | boolean | object>
+) =>
+  useSWR<T>(
+    !!path ? `/api/xview${path}?${qs.stringify(payload)}` : null,
+    (url) => ky.get(url).json()
+  )
