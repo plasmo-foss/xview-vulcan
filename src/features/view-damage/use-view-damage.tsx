@@ -164,7 +164,6 @@ const useViewDamageProvider = () => {
     jobId,
     preTileSet?.item_id,
     postTileSet?.item_id,
-    setStatus,
     setPollingJobId,
     setAssessmentId
   ])
