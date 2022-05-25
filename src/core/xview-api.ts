@@ -44,7 +44,7 @@ export const callXViewAPI = (
       limit: 5,
       methods: ["GET", "POST"],
       statusCodes: [408, 500, 502, 503, 504],
-      maxRetryAfter: undefined
+      maxRetryAfter: 10000000
     },
     timeout: false
   } as Options
