@@ -18,7 +18,7 @@ const xviewAPIMap = {
   "/search-osm-polygons": APIMethod.POST,
   "/fetch-planet-imagery": APIMethod.POST,
   "/launch-assessment": APIMethod.POST,
-  "/fetch-assessment": APIMethod.POST
+  "/fetch-assessment": APIMethod.GET
 }
 
 type XViewAPIPath = keyof typeof xviewAPIMap

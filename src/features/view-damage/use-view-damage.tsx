@@ -1,5 +1,5 @@
 import { TileLayer } from "@deck.gl/geo-layers"
-import { BitmapLayer } from "@deck.gl/layers"
+import { BitmapLayer, GeoJsonLayer } from "@deck.gl/layers"
 import { createProvider } from "puro"
 import { useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { useHashedState } from "use-hashed-state"
@@ -66,6 +66,8 @@ const useViewDamageProvider = () => {
   const [postTileSet, setPostTileSet] = useState<XViewTileSet>(null)
 
   const [tileSets, setTileSets] = useState<Array<XViewTileSet>>([])
+
+  const [assessmentLayer, setAssessmentLayer] = useState<GeoJsonLayer<any>>()
 
   const { data: pollingStatus, error: pollingError } = useXViewAPI<{
     status: string
@@ -169,14 +171,30 @@ const useViewDamageProvider = () => {
   ])
 
   useEffect(() => {
-    console.log(pollingStatus)
-
     if (!pollingStatus || pollingStatus.status !== "done") {
       return
     }
 
-    console.log("Polling done")
-  }, [pollingStatus, pollingStatus?.status])
+    setAssessmentLayer(
+      new GeoJsonLayer({
+        id: "geojson-layer",
+        data: callXViewAPI("/fetch-assessment", {
+          job_id: pollingJobId
+        }).json(),
+        pickable: true,
+        stroked: true,
+        filled: true,
+        extruded: true,
+        pointType: "circle",
+        lineWidthScale: 4,
+        lineWidthMinPixels: 2,
+        getFillColor: [180, 0, 0, 160],
+        getLineColor: [160, 0, 0, 160],
+        getLineWidth: 1,
+        getElevation: 5
+      })
+    )
+  }, [pollingJobId, pollingStatus])
 
   const max = useMemo(() => (tileSets?.length || 1) - 1, [tileSets])
 
@@ -184,7 +202,9 @@ const useViewDamageProvider = () => {
     pollingJobId,
     pollingStatus,
     pollingError,
+
     assessmentId,
+    assessmentLayer,
 
     jobId,
     preTileSet,

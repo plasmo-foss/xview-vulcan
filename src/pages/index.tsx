@@ -1,8 +1,6 @@
-import { GeoJsonLayer } from "@deck.gl/layers"
 import DeckGL from "@deck.gl/react"
-import { Svg3DCenterBox, Svg3DEllipseThreePts } from "iconoir-react"
+import { Svg3DEllipseThreePts } from "iconoir-react"
 import type { NextPage } from "next"
-import { useState } from "react"
 import { Map } from "react-map-gl"
 
 import { ActionButton } from "~features/layouts/action-button"
@@ -40,9 +38,7 @@ const Main = () => {
   const markCoordinate = useMarkCoordinate()
   const { gettingCoordinate, hasBoundary } = markCoordinate
 
-  const { damageLayer } = useViewDamage()
-
-  const [geoJsonLayer, setGeoJsonLayer] = useState<GeoJsonLayer<any>>()
+  const { damageLayer, assessmentLayer } = useViewDamage()
 
   return (
     <MainContainer>
@@ -65,7 +61,7 @@ const Main = () => {
         //     )
         //   }
         // }}
-        layers={[damageLayer, geoJsonLayer, ...markCoordinate.layers]}
+        layers={[damageLayer, assessmentLayer, ...markCoordinate.layers]}
         getCursor={(s) => {
           return gettingCoordinate
             ? hasBoundary
@@ -91,38 +87,6 @@ const Main = () => {
       <RightPanelContainer>
         <MarkCoordinateButton />
         <SendCoordinateButton />
-
-        <ActionButton
-          title="Toggle GeoJSON"
-          active={!!geoJsonLayer}
-          onClick={() => {
-            if (!!geoJsonLayer) {
-              setGeoJsonLayer(null)
-            } else {
-              setCoordinate(50.454, 30.501)
-              setZoom(14)
-
-              setGeoJsonLayer(
-                new GeoJsonLayer({
-                  id: "geojson-layer",
-                  data: fetch("/sample-geo.json").then((r) => r.json()),
-                  pickable: true,
-                  stroked: true,
-                  filled: true,
-                  extruded: true,
-                  pointType: "circle",
-                  lineWidthScale: 4,
-                  lineWidthMinPixels: 2,
-                  getFillColor: [180, 0, 0, 160],
-                  getLineColor: [160, 0, 0, 160],
-                  getLineWidth: 1,
-                  getElevation: 5
-                })
-              )
-            }
-          }}>
-          <Svg3DCenterBox />
-        </ActionButton>
 
         <ActionButton
           title="Reset Bearing and Pitch"
