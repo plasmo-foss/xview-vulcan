@@ -189,7 +189,7 @@ const useViewDamageProvider = () => {
         lineWidthScale: 1,
         lineWidthMinPixels: 1,
         getFillColor: (d) => {
-          const colorScale = (d.properties.dmg - 1) / 3
+          const colorScale = (4 - d.properties.dmg) / 3
           return [256, 256 * colorScale, 256 * colorScale, 160]
         },
         getLineColor: [0, 0, 0, 255]
