@@ -66,7 +66,7 @@
     {
       "id": "3",
       "type": "Feature",
-      "properties": {},
+      "properties": { "level_0": 0, "level_1": 0, "dmg": 0 },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -86,7 +86,7 @@
     {
       "id": "4",
       "type": "Feature",
-      "properties": {},
+      "properties": { "level_0": 0, "level_1": 0, "dmg": 0.8 },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -125,7 +125,7 @@
     {
       "id": "6",
       "type": "Feature",
-      "properties": {},
+      "properties": { "level_0": 0, "level_1": 0, "dmg": 0.2 },
       "geometry": {
         "type": "Polygon",
         "coordinates": [

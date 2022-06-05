@@ -186,12 +186,13 @@ const useViewDamageProvider = () => {
         filled: true,
         extruded: false,
         pointType: "circle",
-        lineWidthScale: 4,
-        lineWidthMinPixels: 2,
-        getFillColor: (d) => [160, 0, 0, d.properties.dmg * 255],
-        getLineColor: (d) => [234, 0, 0, d.properties.dmg * 255],
-        getLineWidth: 1
-        // getElevation: 5
+        lineWidthScale: 1,
+        lineWidthMinPixels: 1,
+        getFillColor: (d) => {
+          const colorScale = d.properties.dmg || 0
+          return [256, 256 * colorScale, 256 * colorScale, 160]
+        },
+        getLineColor: [0, 0, 0, 255]
       })
     )
   }, [pollingJobId, pollingStatus, pollingStatus?.status])
