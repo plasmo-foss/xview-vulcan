@@ -184,17 +184,17 @@ const useViewDamageProvider = () => {
         pickable: true,
         stroked: true,
         filled: true,
-        extruded: true,
+        extruded: false,
         pointType: "circle",
         lineWidthScale: 4,
         lineWidthMinPixels: 2,
-        getFillColor: [180, 0, 0, 160],
-        getLineColor: [160, 0, 0, 160],
-        getLineWidth: 1,
-        getElevation: 5
+        getFillColor: (d) => [160, 0, 0, d.properties.dmg * 255],
+        getLineColor: (d) => [234, 0, 0, d.properties.dmg * 255],
+        getLineWidth: 1
+        // getElevation: 5
       })
     )
-  }, [pollingJobId, pollingStatus])
+  }, [pollingJobId, pollingStatus, pollingStatus?.status])
 
   const max = useMemo(() => (tileSets?.length || 1) - 1, [tileSets])
 
