@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 
-const publicPathList = ["favicons"]
-
-const publicPathSet = new Set(publicPathList)
+export const config = {
+  matcher: "/"
+}
 
 export function middleware(req: NextRequest) {
-  const pathName = req.nextUrl.pathname.split("/")[1]
-  if (publicPathSet.has(pathName)) {
-    return NextResponse.next()
-  }
-
   const basicAuth = req.headers.get("authorization")
 
   if (basicAuth) {
@@ -21,10 +16,7 @@ export function middleware(req: NextRequest) {
     }
   }
 
-  return new Response("Auth required", {
-    status: 401,
-    headers: {
-      "WWW-Authenticate": 'Basic realm="Secure Area"'
-    }
-  })
+  const url = req.nextUrl
+  url.pathname = "/api/auth"
+  return NextResponse.rewrite(url)
 }

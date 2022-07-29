@@ -1,5 +1,9 @@
 import type { NextRequest } from "next/server"
 
+export const config = {
+  runtime: "experimental-edge"
+}
+
 const getTileEndpoint = ({
   tileId = "",
   itemType = "",
@@ -10,7 +14,7 @@ const getTileEndpoint = ({
 }) =>
   `https://tiles${tileId}.planet.com/data/v1/${itemType}/${itemId}/${z}/${x}/${y}.png?api_key=${process.env.PLANET_API_KEY}`
 
-const middleware = (req: NextRequest) => {
+const handler = (req: NextRequest) => {
   const [itemType, itemId, tileId, z, x, y] = req.nextUrl.pathname
     .split("/")
     .splice(3)
@@ -27,4 +31,4 @@ const middleware = (req: NextRequest) => {
   return fetch(tileEndpoint)
 }
 
-export default middleware
+export default handler
