@@ -28,18 +28,7 @@ const handler = async (req: NextRequest) => {
     y
   })
 
-  // return fetch(tileEndpoint)
-
-  const imageResp = await fetch(tileEndpoint)
-
-  const blob = await imageResp.blob()
-
-  return new Response(blob, {
-    headers: {
-      "Content-Type": "image/png",
-      "Content-Length": blob.toString()
-    }
-  })
+  return fetch(tileEndpoint)
 }
 
 export default handler
