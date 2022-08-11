@@ -1,6 +1,6 @@
 import { Layer as GenericLayer, Position } from "@deck.gl/core"
 import { DataSet } from "@deck.gl/core/lib/layer"
-import { IconLayer, LineLayer, PickInfo } from "deck.gl"
+import { IconLayer, LineLayer, PolygonLayer, PickInfo } from "deck.gl"
 import startMarkerSvg from "iconoir/icons/add-pin-alt.svg"
 import endMarkerSvg from "iconoir/icons/minus-pin-alt.svg"
 import { createProvider } from "puro"
@@ -45,7 +45,15 @@ const useMarkCoordinateProvider = () => {
 
   const [lineLayer, setLineLayer] = useState<GenericLayer<Position> | null>(
     null
-  )
+  );
+
+  const [WIPlineLayer, setWIPLineLayer] = useState<GenericLayer<Position> | null>(
+    null
+  );
+
+  const [polygonLayer, setPolygonLayer] = useState<GenericLayer<Position> | null>(
+    null
+  );
 
   const [startMarkerLayer, setStartMarkerLayer] = useState<IconLayer<any>>(null)
   const [endMarkerLayer, setEndMarkerLayer] = useState<IconLayer<any>>(null)
@@ -59,6 +67,8 @@ const useMarkCoordinateProvider = () => {
     setStartPos(undefined)
     setEndPos(undefined)
     setLineLayer(null)
+    setWIPLineLayer(null)
+    setPolygonLayer(null)
     setStartMarkerLayer(null)
     setEndMarkerLayer(null)
   }
@@ -118,6 +128,57 @@ const useMarkCoordinateProvider = () => {
       })
     )
 
+    setWIPLineLayer(
+      new LineLayer({
+        id: 'line-layer',
+        data: [
+          {
+            inbound: 72633,
+            outbound: 74735,
+            from: {
+              name: '19th St. Oakland (19TH)',
+              coordinates: [startLon, startLat],
+            },
+            to: {
+              name: '12th St. Oakland City Center (12TH)',
+              coordinates: [endLon, endLat],
+            },
+          }
+        ],
+        pickable: true,
+        getWidth: 50,
+        getSourcePosition: d => d.from.coordinates,
+        getTargetPosition: d => d.to.coordinates,
+        getColor: d => [Math.sqrt(d.inbound + d.outbound), 140, 0]
+      })
+    )
+
+    setPolygonLayer(
+      new PolygonLayer({
+        id: "polygon",
+        getWidth: 2,
+        data: [
+          {
+            contour: [[-122.4, 37.7], [-122.4, 37.8], [-122.5, 37.8], [-122.5, 37.7], [-122.4, 37.7]],
+            zipcode: 94107,
+            population: 26599,
+            area: 6.11
+          }
+        ],
+        pickable: true,
+        stroked: true,
+        filled: true,
+        wireframe: true,
+        lineWidthMinPixels: 1,
+        getPolygon: d => d.contour,
+        getElevation: d => d.population / d.area / 10,
+        getFillColor: d => [d.population / d.area / 60, 140, 0],
+        getLineColor: [80, 80, 80],
+        getLineWidth: 1
+      })
+    )
+
+
     if (!!startPos && !!endPos) {
       setHasBoundary(true)
     }
@@ -128,7 +189,7 @@ const useMarkCoordinateProvider = () => {
     toggleGettingCoordinate,
     toggleMarker,
     setCursorPos,
-    layers: [lineLayer, startMarkerLayer, endMarkerLayer],
+    layers: [lineLayer, WIPlineLayer, polygonLayer, startMarkerLayer, endMarkerLayer],
     cursorPos,
     endPos,
     startPos,
