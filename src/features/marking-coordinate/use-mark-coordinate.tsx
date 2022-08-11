@@ -9,27 +9,31 @@ import { useContext, useEffect, useState } from "react"
 const svgToDataURL = (svg: string) =>
   `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
 
+let marker_counter = 0;
+
 const createMarker = (
   svg: {
     src: string
     width: number
     height: number
   },
-  position: Position
+  position: Position,
 ) => {
   const data = fetch(svg.src)
     .then((resp) => resp.text())
     .then((d) => [svgToDataURL(d)])
   return new IconLayer<any>({
-    id: svg.src,
+    id: `${svg.src}-${marker_counter++}`,
     data,
     getIcon: (d) => ({
       url: d,
       width: svg.width,
       height: svg.height,
+      mask: true,
       anchorX: svg === startMarkerSvg ? 12 : -6,
       anchorY: 24
     }),
+    getColor: d => [0, 140, 255],
     getSize: 24,
     getPosition: () => position
   })
@@ -38,6 +42,10 @@ const createMarker = (
 const useMarkCoordinateProvider = () => {
   const [startPos, setStartPos] = useState<Position>()
   const [endPos, setEndPos] = useState<Position>()
+
+  const [polygons, setPolygons] = useState([[]])
+  const [markers, setMarkers] = useState([])
+  const [WIPlines, setWIPlines] = useState([])
 
   const [hasBoundary, setHasBoundary] = useState(false)
 
@@ -66,6 +74,9 @@ const useMarkCoordinateProvider = () => {
     setHasBoundary(false)
     setStartPos(undefined)
     setEndPos(undefined)
+    setPolygons([[]])
+    setMarkers([])
+    setWIPlines([])
     setLineLayer(null)
     setWIPLineLayer(null)
     setPolygonLayer(null)
@@ -83,10 +94,21 @@ const useMarkCoordinateProvider = () => {
       return
     }
 
+    /*
+    const [first] = polygons;
+    first.push(e.coordinate);
+    setPolygons([first]);
+    */
+
+    setWIPlines([...WIPlines, e.coordinate]);
+    if (!markers.length) {
+      setMarkers([...markers, createMarker(startMarkerSvg, e.coordinate)]);
+    }
+
     if (!!startPos) {
       setEndPos(e.coordinate)
       setEndMarkerLayer(createMarker(endMarkerSvg, e.coordinate))
-      setGettingCoordinate(false)
+      // setGettingCoordinate(false)
       return
     }
 
@@ -131,22 +153,23 @@ const useMarkCoordinateProvider = () => {
     setWIPLineLayer(
       new LineLayer({
         id: 'line-layer',
-        data: [
-          {
+        data: Array(WIPlines.length - 1).fill(0).map((_, index) => {
+          const from_coords = WIPlines[index];
+          const to_coords = WIPlines[index+1];
+
+          return {
             inbound: 72633,
             outbound: 74735,
             from: {
-              name: '19th St. Oakland (19TH)',
-              coordinates: [startLon, startLat],
+              coordinates: from_coords,
             },
             to: {
-              name: '12th St. Oakland City Center (12TH)',
-              coordinates: [endLon, endLat],
+              coordinates: to_coords,
             },
-          }
-        ],
+          };
+        }),
         pickable: true,
-        getWidth: 50,
+        getWidth: 2,
         getSourcePosition: d => d.from.coordinates,
         getTargetPosition: d => d.to.coordinates,
         getColor: d => [Math.sqrt(d.inbound + d.outbound), 140, 0]
@@ -180,19 +203,23 @@ const useMarkCoordinateProvider = () => {
 
 
     if (!!startPos && !!endPos) {
-      setHasBoundary(true)
+      // setHasBoundary(true)
     }
-  }, [startPos, endPos, cursorPos, hasBoundary])
+  }, [startPos, endPos, polygons, WIPlines, markers, cursorPos, hasBoundary])
 
   return {
     hasBoundary,
     toggleGettingCoordinate,
     toggleMarker,
     setCursorPos,
-    layers: [lineLayer, WIPlineLayer, polygonLayer, startMarkerLayer, endMarkerLayer],
+    // layers: [lineLayer, WIPlineLayer, polygonLayer, startMarkerLayer, endMarkerLayer, ...markers],
+    layers: [WIPlineLayer, ...markers],
     cursorPos,
     endPos,
     startPos,
+    polygons,
+    WIPlines,
+    markers,
     gettingCoordinate
   }
 }
