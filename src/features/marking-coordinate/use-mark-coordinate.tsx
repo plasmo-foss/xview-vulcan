@@ -95,12 +95,6 @@ const useMarkCoordinateProvider = () => {
       return
     }
 
-    /*
-    const [first] = polygons;
-    first.push(e.coordinate);
-    setPolygons([first]);
-    */
-
     const [firstVertex] = WIPlines;
 
     if (!!firstVertex) {
@@ -115,6 +109,13 @@ const useMarkCoordinateProvider = () => {
         setPolygons([...polygons, [...WIPlines]]);
         setWIPlines([]);
         setMarkers([]);
+
+        // TODO: refactor these mode flags; right now you have to pick 2 polygons
+        if (polygons.length > 1) {
+          setGettingCoordinate(false)
+          setTimeout(() => setHasBoundary(true), 1000); // TODO: this works around a race condition re: displaying the polygons; get rid of the setTimout and actually fix it
+        }
+
         return;
       }
     }
@@ -127,7 +128,6 @@ const useMarkCoordinateProvider = () => {
     if (!!startPos) {
       setEndPos(e.coordinate)
       setEndMarkerLayer(createMarker(endMarkerSvg, e.coordinate))
-      // setGettingCoordinate(false)
       return
     }
 
@@ -210,7 +210,7 @@ const useMarkCoordinateProvider = () => {
         pickable: true,
         stroked: true,
         filled: true,
-        opacity: .25,
+        opacity: .15,
         wireframe: true,
         lineWidthMinPixels: 1,
         getPolygon: d => d.contour,
