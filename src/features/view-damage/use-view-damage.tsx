@@ -82,7 +82,14 @@ const useViewDamageProvider = () => {
 
     async function sendCoordinates() {
       setStatus("Sending polygons ...")
-      const newJobId = await callXViewAPI("/send-polygons", { polygons }).json<string>();
+      const newJobId = await callXViewAPI("/send-polygons", {
+        polygons: polygons.map((geometry) => {
+          return {
+            class: "building",
+            geometry,
+          };
+        })
+      }).json<string>();
 
       setJobId(newJobId)
     }
