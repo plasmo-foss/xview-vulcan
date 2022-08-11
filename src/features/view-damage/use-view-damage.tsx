@@ -50,7 +50,7 @@ const createTilesLayer = ({ itemType = "", itemId = "" }) =>
 
 const useViewDamageProvider = () => {
   const { setStatus } = useStatusUpdate()
-  const { startPos, endPos, hasBoundary } = useMarkCoordinate()
+  const { hasBoundary, polygons } = useMarkCoordinate()
 
   const [pollingJobId, setPollingJobId] = useHashedState("job-id", "")
   const [assessmentId, setAssessmentId] = useHashedState("assessment-id", "")
@@ -76,24 +76,19 @@ const useViewDamageProvider = () => {
   })
 
   useEffect(() => {
-    if (!hasBoundary || !startPos || !endPos) {
+    if (!hasBoundary || !polygons) {
       return
     }
 
     async function sendCoordinates() {
       setStatus("Sending start and end coordinates...")
-      const newJobId = await callXViewAPI("/send-coordinates", {
-        start_lon: startPos[0],
-        start_lat: startPos[1],
-        end_lon: endPos[0],
-        end_lat: endPos[1]
-      }).json<string>()
+      const newJobId = await callXViewAPI("/send-polygons", { polygons }).json<string>();
 
       setJobId(newJobId)
     }
 
     sendCoordinates()
-  }, [startPos, endPos, hasBoundary, setJobId, setStatus])
+  }, [hasBoundary, setJobId, setStatus])
 
   useEffect(() => {
     if (!jobId) {
