@@ -9,6 +9,7 @@ import { useContext, useEffect, useState } from "react"
 const svgToDataURL = (svg: string) =>
   `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
 
+// TODO: get rid of this, this global is the wrong way to handle dynamic elements
 let marker_counter = 0;
 
 const createMarker = (
@@ -100,6 +101,24 @@ const useMarkCoordinateProvider = () => {
     setPolygons([first]);
     */
 
+    const [firstVertex] = WIPlines;
+
+    if (!!firstVertex) {
+      const [alon, alat] = firstVertex;
+      const [blon, blat] = e.coordinate;
+
+      // TODO: the sensitivity of the click threshold needs to depend on the zoom level
+      const threshold = .005;
+
+      if (Math.abs(alon - blon) < threshold && Math.abs(alat - blat)) {
+        setWIPlines([...WIPlines, WIPlines[0]]);
+        setPolygons([...polygons, [...WIPlines]]);
+        setWIPlines([]);
+        setMarkers([]);
+        return;
+      }
+    }
+
     setWIPlines([...WIPlines, e.coordinate]);
     if (!markers.length) {
       setMarkers([...markers, createMarker(startMarkerSvg, e.coordinate)]);
@@ -153,7 +172,7 @@ const useMarkCoordinateProvider = () => {
     setWIPLineLayer(
       new LineLayer({
         id: 'line-layer',
-        data: Array(WIPlines.length - 1).fill(0).map((_, index) => {
+        data: WIPlines.length ? Array(WIPlines.length - 1).fill(0).map((_, index) => {
           const from_coords = WIPlines[index];
           const to_coords = WIPlines[index+1];
 
@@ -167,7 +186,7 @@ const useMarkCoordinateProvider = () => {
               coordinates: to_coords,
             },
           };
-        }),
+        }) : [],
         pickable: true,
         getWidth: 2,
         getSourcePosition: d => d.from.coordinates,
@@ -180,17 +199,18 @@ const useMarkCoordinateProvider = () => {
       new PolygonLayer({
         id: "polygon",
         getWidth: 2,
-        data: [
-          {
-            contour: [[-122.4, 37.7], [-122.4, 37.8], [-122.5, 37.8], [-122.5, 37.7], [-122.4, 37.7]],
+        data: polygons.map((p) => {
+          return {
+            contour: p,
             zipcode: 94107,
             population: 26599,
             area: 6.11
-          }
-        ],
+          };
+        }),
         pickable: true,
         stroked: true,
         filled: true,
+        opacity: .25,
         wireframe: true,
         lineWidthMinPixels: 1,
         getPolygon: d => d.contour,
@@ -213,7 +233,7 @@ const useMarkCoordinateProvider = () => {
     toggleMarker,
     setCursorPos,
     // layers: [lineLayer, WIPlineLayer, polygonLayer, startMarkerLayer, endMarkerLayer, ...markers],
-    layers: [WIPlineLayer, ...markers],
+    layers: [WIPlineLayer, polygonLayer, ...markers],
     cursorPos,
     endPos,
     startPos,
