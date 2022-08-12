@@ -6,6 +6,10 @@ import endMarkerSvg from "iconoir/icons/minus-pin-alt.svg"
 import { createProvider } from "puro"
 import { useContext, useEffect, useState } from "react"
 
+import {
+  useMapNavigation
+} from "~features/map-navigation/use-map-navigation";
+
 const svgToDataURL = (svg: string) =>
   `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
 
@@ -71,6 +75,8 @@ const useMarkCoordinateProvider = () => {
 
   const toggleGettingCoordinate = () => setGettingCoordinate(!gettingCoordinate)
 
+  const { viewState } = useMapNavigation()
+
   const reset = () => {
     setHasBoundary(false)
     setStartPos(undefined)
@@ -101,8 +107,8 @@ const useMarkCoordinateProvider = () => {
       const [alon, alat] = firstVertex;
       const [blon, blat] = e.coordinate;
 
-      // TODO: the sensitivity of the click threshold needs to depend on the zoom level
-      const threshold = .005;
+      const { zoom } = viewState;
+      const threshold = Math.pow(1.8, (22-zoom))/231000;
 
       if (Math.abs(alon - blon) < threshold && Math.abs(alat - blat) && WIPlines.length > 1) {
         setWIPlines([...WIPlines, WIPlines[0]]);
