@@ -104,7 +104,7 @@ const useMarkCoordinateProvider = () => {
       // TODO: the sensitivity of the click threshold needs to depend on the zoom level
       const threshold = .005;
 
-      if (Math.abs(alon - blon) < threshold && Math.abs(alat - blat)) {
+      if (Math.abs(alon - blon) < threshold && Math.abs(alat - blat) && WIPlines.length > 1) {
         setWIPlines([...WIPlines, WIPlines[0]]);
         setPolygons([...polygons, [...WIPlines]]);
         setWIPlines([]);
