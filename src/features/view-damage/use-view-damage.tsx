@@ -57,8 +57,6 @@ const useViewDamageProvider = () => {
 
   const [jobId, setJobId] = useState("")
 
-  const [damageLayer, setDamageLayer] = useState<TileLayer<any>>(null)
-
   const [activePeriod, setActivePeriod] = useState(LayerPeriod.Default)
 
   const [activeTileSet, setActiveTileSet] = useState<XViewTileSet>(null)
@@ -68,6 +66,10 @@ const useViewDamageProvider = () => {
   const [tileSets, setTileSets] = useState<Array<XViewTileSet>>([])
 
   const [assessmentLayer, setAssessmentLayer] = useState<GeoJsonLayer<any>>()
+
+  const [damageLayer, setDamageLayer] = useState<
+    TileLayer<any> | BitmapLayer<any>
+  >(null)
 
   const { data: pollingStatus, error: pollingError } = useXViewAPI<{
     status: string
@@ -138,6 +140,24 @@ const useViewDamageProvider = () => {
       })
     )
   }, [activeTileSet])
+
+  // useEffect(() => {
+  //   if (!startPos || !endPos) {
+  //     setDamageLayer(null)
+  //     return
+  //   }
+  //   const [startLon, startLat] = startPos
+  //   const [endLon, endLat] = endPos
+
+  //   setDamageLayer(
+  //     new BitmapLayer({
+  //       id: "bitmap-layer",
+  //       bounds: [startLon, endLat, endLon, startLat],
+  //       image:
+  //         "https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/sf-districts.png"
+  //     })
+  //   )
+  // }, [startPos, endPos])
 
   useEffect(() => {
     if (activePeriod === LayerPeriod.Default) {
