@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
 import {
-  EyeAlt,
-  EyeOff,
+  Check,
   KeyframeAlignVertical,
+  Minus,
   RemoveKeyframeAlt
 } from "iconoir-react"
 import { useState } from "react"
@@ -23,8 +23,7 @@ export const OsmToggleButton = styled(ToggleSliderButton)`
 
 export const ViewDamagePanel = () => {
   const [showSlider, setShowSlider] = useState(true)
-  const [isOsm, setIsOsm] = useState(false)
-  const { tileSets } = useViewDamage()
+  const { tileSets, isOsmPoly, setIsOsmPoly } = useViewDamage()
 
   if (tileSets.length === 0) {
     return null
@@ -42,11 +41,11 @@ export const ViewDamagePanel = () => {
       </ToggleSliderButton>
       <OsmToggleButton
         title="Toggle OSM"
-        active={isOsm}
+        active={isOsmPoly}
         onClick={() => {
-          setIsOsm(!isOsm)
+          setIsOsmPoly((s) => !s)
         }}>
-        {isOsm ? <EyeAlt /> : <EyeOff />}
+        {isOsmPoly ? <Check /> : <Minus />}
         <span>OSM</span>
       </OsmToggleButton>
       {showSlider && <TimeSlider />}

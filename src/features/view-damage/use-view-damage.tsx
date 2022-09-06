@@ -66,6 +66,7 @@ const useViewDamageProvider = () => {
   const [tileSets, setTileSets] = useState<Array<XViewTileSet>>([])
 
   const [assessmentLayer, setAssessmentLayer] = useState<GeoJsonLayer<any>>()
+  const [isOsmPoly, setIsOsmPoly] = useState(false)
 
   const [damageLayer, setDamageLayer] = useState<
     TileLayer<any> | BitmapLayer<any>
@@ -113,6 +114,7 @@ const useViewDamageProvider = () => {
         ).json()
 
         const tileSets = data.images.reverse()
+        // console.log(data)
 
         setStatus(null)
 
@@ -176,6 +178,7 @@ const useViewDamageProvider = () => {
 
     const data = await callXViewAPI("/launch-assessment", {
       job_id: jobId,
+      osm_poly: isOsmPoly,
       pre_image_id: preTileSet.item_id,
       post_image_id: postTileSet.item_id
     }).json<string>()
@@ -183,6 +186,7 @@ const useViewDamageProvider = () => {
     setAssessmentId(data)
   }, [
     jobId,
+    isOsmPoly,
     preTileSet?.item_id,
     postTileSet?.item_id,
     setPollingJobId,
@@ -232,6 +236,9 @@ const useViewDamageProvider = () => {
 
     setPreTileSet,
     setPostTileSet,
+
+    isOsmPoly,
+    setIsOsmPoly,
 
     launchAssessment,
 
