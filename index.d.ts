@@ -3,6 +3,7 @@ declare namespace NodeJS {
     PUBLIC_URL: string
     VERCEL_ENV: "production" | "preview" | "development"
 
+    MAXAR_API_KEY: string
     PLANET_API_KEY: string
     AI_INTERNAL_ENDPOINT: string
     AI_INTERNAL_API_KEY: string

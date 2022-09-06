@@ -153,8 +153,7 @@ const useViewDamageProvider = () => {
   //     new BitmapLayer({
   //       id: "bitmap-layer",
   //       bounds: [startLon, endLat, endLon, startLat],
-  //       image:
-  //         "https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/sf-districts.png"
+  //       image: "/api/bitmap/test"
   //     })
   //   )
   // }, [startPos, endPos])
