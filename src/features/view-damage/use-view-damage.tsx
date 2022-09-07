@@ -48,6 +48,37 @@ const createTilesLayer = ({ itemType = "", itemId = "" }) =>
     }
   })
 
+const getOsmBuildingTilesUrl = () =>
+  ["a", "b", "c", "d"].map(
+    (t) =>
+      `https://${t}.data.osmbuildings.org/0.2/anonymous/tile/{z}/{x}/{y}.json`
+  )
+
+const createOsmTilesLayer = () =>
+  new TileLayer({
+    id: "osm-building-tile-layer",
+    data: getOsmBuildingTilesUrl(),
+    minZoom: 0,
+    maxZoom: 18,
+    tileSize: 256,
+
+    renderSubLayers: ({ tile }) =>
+      new GeoJsonLayer({
+        id: tile.id,
+        data: tile.url,
+        wireframe: true,
+        stroked: true,
+        filled: true,
+        extruded: true,
+        lineWidthScale: 20,
+        lineWidthMinPixels: 2,
+        getLineColor: [0, 0, 0, 255],
+        getPointRadius: 100,
+        getLineWidth: 1,
+        getElevation: 30
+      })
+  })
+
 const useViewDamageProvider = () => {
   const { setStatus } = useStatusUpdate()
   const { startPos, endPos, hasBoundary } = useMarkCoordinate()
@@ -66,6 +97,7 @@ const useViewDamageProvider = () => {
   const [tileSets, setTileSets] = useState<Array<XViewTileSet>>([])
 
   const [assessmentLayer, setAssessmentLayer] = useState<GeoJsonLayer<any>>()
+  const [osmBuildingLayer, setOsmBuildingLayer] = useState<TileLayer<any>>()
   const [isOsmPoly, setIsOsmPoly] = useState(false)
 
   const [damageLayer, setDamageLayer] = useState<
@@ -222,6 +254,13 @@ const useViewDamageProvider = () => {
 
   const max = useMemo(() => (tileSets?.length || 1) - 1, [tileSets])
 
+  const toggleOsmPoly = () =>
+    setIsOsmPoly((s) => {
+      const newState = !s
+      setOsmBuildingLayer(newState ? createOsmTilesLayer() : null)
+      return newState
+    })
+
   return {
     pollingJobId,
     pollingStatus,
@@ -238,7 +277,8 @@ const useViewDamageProvider = () => {
     setPostTileSet,
 
     isOsmPoly,
-    setIsOsmPoly,
+    toggleOsmPoly,
+    osmBuildingLayer,
 
     launchAssessment,
 

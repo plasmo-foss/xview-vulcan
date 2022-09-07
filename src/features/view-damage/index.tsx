@@ -23,32 +23,31 @@ export const OsmToggleButton = styled(ToggleSliderButton)`
 
 export const ViewDamagePanel = () => {
   const [showSlider, setShowSlider] = useState(true)
-  const { tileSets, isOsmPoly, setIsOsmPoly } = useViewDamage()
-
-  if (tileSets.length === 0) {
-    return null
-  }
+  const { tileSets, isOsmPoly, toggleOsmPoly } = useViewDamage()
 
   return (
     <>
-      <ToggleSliderButton
-        title="Toggle Slider"
-        active={showSlider}
-        onClick={() => {
-          setShowSlider(!showSlider)
-        }}>
-        {showSlider ? <RemoveKeyframeAlt /> : <KeyframeAlignVertical />}
-      </ToggleSliderButton>
       <OsmToggleButton
         title="Toggle OSM"
         active={isOsmPoly}
-        onClick={() => {
-          setIsOsmPoly((s) => !s)
-        }}>
+        onClick={() => toggleOsmPoly()}>
         {isOsmPoly ? <Check /> : <Minus />}
         <span>OSM</span>
       </OsmToggleButton>
-      {showSlider && <TimeSlider />}
+      {tileSets.length > 0 && (
+        <>
+          <ToggleSliderButton
+            title="Toggle Slider"
+            active={showSlider}
+            onClick={() => {
+              setShowSlider(!showSlider)
+            }}>
+            {showSlider ? <RemoveKeyframeAlt /> : <KeyframeAlignVertical />}
+          </ToggleSliderButton>
+
+          {showSlider && <TimeSlider />}
+        </>
+      )}
     </>
   )
 }

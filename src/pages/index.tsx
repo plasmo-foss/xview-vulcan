@@ -38,7 +38,7 @@ const Main = () => {
   const markCoordinate = useMarkCoordinate()
   const { gettingCoordinate, hasBoundary } = markCoordinate
 
-  const { damageLayer, assessmentLayer } = useViewDamage()
+  const { damageLayer, assessmentLayer, osmBuildingLayer } = useViewDamage()
 
   // const [geoJsonLayer, setGeoJsonLayer] = useState<GeoJsonLayer<any>>()
 
@@ -67,6 +67,7 @@ const Main = () => {
           damageLayer,
           // geoJsonLayer,
           assessmentLayer,
+          osmBuildingLayer,
           ...markCoordinate.layers
         ]}
         getCursor={(s) => {
