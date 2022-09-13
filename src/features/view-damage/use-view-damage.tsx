@@ -13,6 +13,7 @@ import {
 import { useStatusUpdate } from "~features/layouts/use-status-update"
 import { useMarkCoordinate } from "~features/marking-coordinate/use-mark-coordinate"
 
+import { ChipLayer } from "./chip-layer"
 import { dateImageMap, dateList } from "./mock-data"
 
 export enum LayerPeriod {
@@ -26,6 +27,7 @@ const getTilesUrl = ({ itemType = "", itemId = "" }) =>
 
 const createTilesLayer = ({ itemType = "", itemId = "" }) =>
   new TileLayer({
+    id: "damage-layer-tileset",
     // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Tile_servers
     data: getTilesUrl({
       itemType,
@@ -68,9 +70,9 @@ const useViewDamageProvider = () => {
   const [assessmentLayer, setAssessmentLayer] = useState<GeoJsonLayer<any>>()
   const [isOsmPoly, setIsOsmPoly] = useState(false)
 
-  const [damageLayer, setDamageLayer] = useState<
-    TileLayer<any> | BitmapLayer<any>
-  >(null)
+  const [damageLayer, setDamageLayer] = useState<TileLayer<any> | ChipLayer>(
+    null
+  )
 
   const { data: pollingStatus, error: pollingError } = useXViewAPI<{
     status: string
@@ -135,30 +137,27 @@ const useViewDamageProvider = () => {
       return
     }
 
-    setDamageLayer(
-      createTilesLayer({
-        itemType: activeTileSet.item_type,
-        itemId: activeTileSet.item_id
-      })
-    )
+    switch (activeTileSet.provider) {
+      case "Planet":
+        setDamageLayer(
+          createTilesLayer({
+            itemType: activeTileSet.item_type,
+            itemId: activeTileSet.item_id
+          })
+        )
+        break
+
+      case "MAXAR":
+        setDamageLayer(
+          new ChipLayer({
+            id: "damage-layer-raster",
+            chips: activeTileSet.extra.chips,
+            featureId: activeTileSet.item_id
+          })
+        )
+        break
+    }
   }, [activeTileSet])
-
-  // useEffect(() => {
-  //   if (!startPos || !endPos) {
-  //     setDamageLayer(null)
-  //     return
-  //   }
-  //   const [startLon, startLat] = startPos
-  //   const [endLon, endLat] = endPos
-
-  //   setDamageLayer(
-  //     new BitmapLayer({
-  //       id: "bitmap-layer",
-  //       bounds: [startLon, endLat, endLon, startLat],
-  //       image: "/api/bitmap/test"
-  //     })
-  //   )
-  // }, [startPos, endPos])
 
   useEffect(() => {
     if (activePeriod === LayerPeriod.Default) {

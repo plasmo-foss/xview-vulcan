@@ -13,9 +13,16 @@ const getBitmappoint = ({
   `https://evwhs.digitalglobe.com/mapservice/wmsaccess?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=DigitalGlobe:Imagery&FORMAT=image/png&HEIGHT=${height}&WIDTH=${width}&CONNECTID=${process.env.MAXAR_API_KEY}&FEATUREPROFILE=Default_Profile&COVERAGE_CQL_FILTER=featureId=%27${featureId}%27&CRS=EPSG:4326&BBOX=${bbox}`
 
 const handler = async (req: NextRequest) => {
-  const [] = req.nextUrl.pathname.split("/").splice(3)
+  const [featureId, height, width, bbox] = req.nextUrl.pathname
+    .split("/")
+    .splice(3)
 
-  const bitmapEndpoint = getBitmappoint()
+  const bitmapEndpoint = getBitmappoint({
+    height,
+    width,
+    featureId,
+    bbox
+  })
 
   return fetch(bitmapEndpoint)
 }

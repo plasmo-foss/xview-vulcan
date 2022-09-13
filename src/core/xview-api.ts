@@ -27,7 +27,26 @@ export type XViewTileSet = {
   timestamp: string
   item_type: string
   item_id: string
-}
+} & (
+  | {
+      provider: "Planet"
+      return_type: "tileset"
+    }
+  | {
+      provider: "MAXAR" | "Planet"
+      return_type: "raster" | "tileset"
+      extra?: {
+        chips: Array<{
+          height: number
+          width: number
+          bbox: string
+        }>
+      }
+    }
+  | {
+      provider: "HELLO"
+    }
+)
 
 export type XViewApiFetchPlanetImageryResponse = {
   uid: string

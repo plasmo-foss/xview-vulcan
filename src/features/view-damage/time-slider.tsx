@@ -109,6 +109,8 @@ const Mark = (props: any) => {
         style={{
           opacity: hover ? 1 : 0
         }}>
+        <b>{props.provider || "Provider"}</b>
+        <br />
         {props.date}
       </MarkTimestamp>
     </div>
@@ -152,6 +154,7 @@ export const TimeSlider = () => {
         renderMark={(props) => (
           <Mark
             {...props}
+            provider={tileSets[props.key].provider}
             date={new Date(tileSets[props.key].timestamp).toDateString()}
           />
         )}
@@ -184,6 +187,8 @@ export const TimeSlider = () => {
               }>
               {isPre ? <KeyframePosition /> : <Keyframe />}
               <Timestamp>
+                <b>{tileSet.provider || "Provider"}</b>
+                <br />
                 {new Date(tileSet?.timestamp).toDateString()}
               </Timestamp>
             </div>
