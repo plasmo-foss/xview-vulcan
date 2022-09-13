@@ -106,7 +106,7 @@ const useViewDamageProvider = () => {
     }
 
     async function fetchPlanetImagery() {
-      setStatus("Fetching planet imagery...")
+      setStatus("Fetching image data...")
       try {
         const data: XViewApiFetchPlanetImageryResponse = await callXViewAPI(
           "/fetch-planet-imagery",
