@@ -38,7 +38,8 @@ const Main = () => {
   const markCoordinate = useMarkCoordinate()
   const { gettingCoordinate, hasBoundary } = markCoordinate
 
-  const { damageLayer, assessmentLayer, osmBuildingLayer } = useViewDamage()
+  const { damageLayer, assessmentLayer, osmBuildingLayer, isOsmPoly } =
+    useViewDamage()
 
   return (
     <MainContainer>
@@ -63,8 +64,8 @@ const Main = () => {
         // }}
         layers={[
           damageLayer,
-          osmBuildingLayer,
           assessmentLayer,
+          isOsmPoly && osmBuildingLayer,
           ...markCoordinate.layers
         ]}
         getCursor={(s) => {
