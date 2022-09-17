@@ -68,6 +68,8 @@ const useViewDamageProvider = () => {
   const [tileSets, setTileSets] = useState<Array<XViewTileSet>>([])
 
   const [assessmentLayer, setAssessmentLayer] = useState<GeoJsonLayer<any>>()
+  const [osmBuildingLayer, setOsmBuildingLayer] = useState<GeoJsonLayer<any>>()
+
   const [isOsmPoly, setIsOsmPoly] = useState(false)
 
   const [damageLayer, setDamageLayer] = useState<TileLayer<any> | ChipLayer>(
@@ -95,6 +97,24 @@ const useViewDamageProvider = () => {
       }).json<string>()
 
       setJobId(newJobId)
+
+      setOsmBuildingLayer(
+        new GeoJsonLayer({
+          id: "osm-geojson-layer",
+          data: callXViewAPI("/fetch-osm-polygons", {
+            job_id: newJobId
+          }).json(),
+          pickable: true,
+          stroked: true,
+          filled: true,
+          extruded: false,
+          pointType: "circle",
+          lineWidthScale: 1,
+          lineWidthMinPixels: 1,
+          getFillColor: [256, 256, 256, 160],
+          getLineColor: [0, 0, 0, 255]
+        })
+      )
     }
 
     sendCoordinates()
@@ -236,6 +256,7 @@ const useViewDamageProvider = () => {
     setPreTileSet,
     setPostTileSet,
 
+    osmBuildingLayer,
     isOsmPoly,
     setIsOsmPoly,
 

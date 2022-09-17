@@ -38,9 +38,7 @@ const Main = () => {
   const markCoordinate = useMarkCoordinate()
   const { gettingCoordinate, hasBoundary } = markCoordinate
 
-  const { damageLayer, assessmentLayer } = useViewDamage()
-
-  // const [geoJsonLayer, setGeoJsonLayer] = useState<GeoJsonLayer<any>>()
+  const { damageLayer, assessmentLayer, osmBuildingLayer } = useViewDamage()
 
   return (
     <MainContainer>
@@ -65,7 +63,7 @@ const Main = () => {
         // }}
         layers={[
           damageLayer,
-          // geoJsonLayer,
+          osmBuildingLayer,
           assessmentLayer,
           ...markCoordinate.layers
         ]}
@@ -92,38 +90,6 @@ const Main = () => {
       <ViewDamagePanel />
 
       <RightPanelContainer>
-        {/* <ActionButton
-          title="Toggle GeoJSON"
-          active={!!geoJsonLayer}
-          onClick={() => {
-            if (!!geoJsonLayer) {
-              setGeoJsonLayer(null)
-            } else {
-              setCoordinate(50.454, 30.501)
-              setZoom(14)
-
-              setGeoJsonLayer(
-                new GeoJsonLayer({
-                  id: "geojson-layer",
-                  data: fetch("/sample-geo.json").then((r) => r.json()),
-                  pickable: true,
-                  stroked: true,
-                  filled: true,
-                  extruded: false,
-                  pointType: "circle",
-                  lineWidthScale: 1,
-                  lineWidthMinPixels: 1,
-                  getFillColor: (d) => {
-                    const colorScale = d.properties.dmg || 0
-                    return [256, 256 * colorScale, 256 * colorScale, 160]
-                  },
-                  getLineColor: [0, 0, 0, 255]
-                })
-              )
-            }
-          }}>
-          <Svg3DCenterBox />
-        </ActionButton> */}
         <MarkCoordinateButton />
         <SendCoordinateButton />
 

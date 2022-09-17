@@ -12,7 +12,7 @@ export enum APIMethod {
 const xviewAPIMap = {
   "/fetch-coordinates": APIMethod.GET,
   "/job-status": APIMethod.GET,
-  "/fetch-osm-polygons": APIMethod.GET,
+  "/fetch-osm-polygons": APIMethod.POST,
 
   "/send-coordinates": APIMethod.POST,
   "/search-osm-polygons": APIMethod.POST,
