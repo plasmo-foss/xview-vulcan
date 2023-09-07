@@ -15,6 +15,7 @@ const xviewAPIMap = {
   "/fetch-osm-polygons": APIMethod.GET,
 
   "/send-coordinates": APIMethod.POST,
+  "/send-polygons": APIMethod.POST,
   "/search-osm-polygons": APIMethod.POST,
   "/fetch-planet-imagery": APIMethod.POST,
   "/launch-assessment": APIMethod.POST,

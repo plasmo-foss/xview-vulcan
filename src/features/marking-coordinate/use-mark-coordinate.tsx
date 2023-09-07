@@ -1,13 +1,20 @@
 import { Layer as GenericLayer, Position } from "@deck.gl/core"
 import { DataSet } from "@deck.gl/core/lib/layer"
-import { IconLayer, LineLayer, PickInfo } from "deck.gl"
+import { IconLayer, LineLayer, PolygonLayer, PickInfo } from "deck.gl"
 import startMarkerSvg from "iconoir/icons/add-pin-alt.svg"
 import endMarkerSvg from "iconoir/icons/minus-pin-alt.svg"
 import { createProvider } from "puro"
 import { useContext, useEffect, useState } from "react"
 
+import {
+  useMapNavigation
+} from "~features/map-navigation/use-map-navigation";
+
 const svgToDataURL = (svg: string) =>
   `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
+
+// TODO: get rid of this, this global is the wrong way to handle dynamic elements
+let marker_counter = 0;
 
 const createMarker = (
   svg: {
@@ -15,21 +22,23 @@ const createMarker = (
     width: number
     height: number
   },
-  position: Position
+  position: Position,
 ) => {
   const data = fetch(svg.src)
     .then((resp) => resp.text())
     .then((d) => [svgToDataURL(d)])
   return new IconLayer<any>({
-    id: svg.src,
+    id: `${svg.src}-${marker_counter++}`,
     data,
     getIcon: (d) => ({
       url: d,
       width: svg.width,
       height: svg.height,
+      mask: true,
       anchorX: svg === startMarkerSvg ? 12 : -6,
       anchorY: 24
     }),
+    getColor: d => [0, 140, 255],
     getSize: 24,
     getPosition: () => position
   })
@@ -39,13 +48,25 @@ const useMarkCoordinateProvider = () => {
   const [startPos, setStartPos] = useState<Position>()
   const [endPos, setEndPos] = useState<Position>()
 
+  const [polygons, setPolygons] = useState([[]])
+  const [markers, setMarkers] = useState([])
+  const [WIPlines, setWIPlines] = useState([])
+
   const [hasBoundary, setHasBoundary] = useState(false)
 
   const [gettingCoordinate, setGettingCoordinate] = useState(false)
 
   const [lineLayer, setLineLayer] = useState<GenericLayer<Position> | null>(
     null
-  )
+  );
+
+  const [WIPlineLayer, setWIPLineLayer] = useState<GenericLayer<Position> | null>(
+    null
+  );
+
+  const [polygonLayer, setPolygonLayer] = useState<GenericLayer<Position> | null>(
+    null
+  );
 
   const [startMarkerLayer, setStartMarkerLayer] = useState<IconLayer<any>>(null)
   const [endMarkerLayer, setEndMarkerLayer] = useState<IconLayer<any>>(null)
@@ -54,11 +75,18 @@ const useMarkCoordinateProvider = () => {
 
   const toggleGettingCoordinate = () => setGettingCoordinate(!gettingCoordinate)
 
+  const { viewState } = useMapNavigation()
+
   const reset = () => {
     setHasBoundary(false)
     setStartPos(undefined)
     setEndPos(undefined)
+    setPolygons([[]])
+    setMarkers([])
+    setWIPlines([])
     setLineLayer(null)
+    setWIPLineLayer(null)
+    setPolygonLayer(null)
     setStartMarkerLayer(null)
     setEndMarkerLayer(null)
   }
@@ -73,10 +101,39 @@ const useMarkCoordinateProvider = () => {
       return
     }
 
+    const [firstVertex] = WIPlines;
+
+    if (!!firstVertex) {
+      const [alon, alat] = firstVertex;
+      const [blon, blat] = e.coordinate;
+
+      const { zoom } = viewState;
+      const threshold = Math.pow(1.8, (22-zoom))/231000;
+
+      if (Math.abs(alon - blon) < threshold && Math.abs(alat - blat) && WIPlines.length > 1) {
+        setWIPlines([...WIPlines, WIPlines[0]]);
+        setPolygons([...polygons, [...WIPlines]]);
+        setWIPlines([]);
+        setMarkers([]);
+
+        // TODO: refactor these mode flags; right now you have to pick 2 polygons
+        if (polygons.length > 1) {
+          setGettingCoordinate(false)
+          setTimeout(() => setHasBoundary(true), 1000); // TODO: this works around a race condition re: displaying the polygons; get rid of the setTimout and actually fix it
+        }
+
+        return;
+      }
+    }
+
+    setWIPlines([...WIPlines, e.coordinate]);
+    if (!markers.length) {
+      setMarkers([...markers, createMarker(startMarkerSvg, e.coordinate)]);
+    }
+
     if (!!startPos) {
       setEndPos(e.coordinate)
       setEndMarkerLayer(createMarker(endMarkerSvg, e.coordinate))
-      setGettingCoordinate(false)
       return
     }
 
@@ -118,20 +175,77 @@ const useMarkCoordinateProvider = () => {
       })
     )
 
+    setWIPLineLayer(
+      new LineLayer({
+        id: 'line-layer',
+        data: WIPlines.length ? Array(WIPlines.length - 1).fill(0).map((_, index) => {
+          const from_coords = WIPlines[index];
+          const to_coords = WIPlines[index+1];
+
+          return {
+            inbound: 72633,
+            outbound: 74735,
+            from: {
+              coordinates: from_coords,
+            },
+            to: {
+              coordinates: to_coords,
+            },
+          };
+        }) : [],
+        pickable: true,
+        getWidth: 2,
+        getSourcePosition: d => d.from.coordinates,
+        getTargetPosition: d => d.to.coordinates,
+        getColor: d => [Math.sqrt(d.inbound + d.outbound), 140, 0]
+      })
+    )
+
+    setPolygonLayer(
+      new PolygonLayer({
+        id: "polygon",
+        getWidth: 2,
+        data: polygons.map((p) => {
+          return {
+            contour: p,
+            zipcode: 94107,
+            population: 26599,
+            area: 6.11
+          };
+        }),
+        pickable: true,
+        stroked: true,
+        filled: true,
+        opacity: .15,
+        wireframe: true,
+        lineWidthMinPixels: 1,
+        getPolygon: d => d.contour,
+        getElevation: d => d.population / d.area / 10,
+        getFillColor: d => [d.population / d.area / 60, 140, 0],
+        getLineColor: [80, 80, 80],
+        getLineWidth: 1
+      })
+    )
+
+
     if (!!startPos && !!endPos) {
-      setHasBoundary(true)
+      // setHasBoundary(true)
     }
-  }, [startPos, endPos, cursorPos, hasBoundary])
+  }, [startPos, endPos, polygons, WIPlines, markers, cursorPos, hasBoundary])
 
   return {
     hasBoundary,
     toggleGettingCoordinate,
     toggleMarker,
     setCursorPos,
-    layers: [lineLayer, startMarkerLayer, endMarkerLayer],
+    // layers: [lineLayer, WIPlineLayer, polygonLayer, startMarkerLayer, endMarkerLayer, ...markers],
+    layers: [WIPlineLayer, polygonLayer, ...markers],
     cursorPos,
     endPos,
     startPos,
+    polygons,
+    WIPlines,
+    markers,
     gettingCoordinate
   }
 }

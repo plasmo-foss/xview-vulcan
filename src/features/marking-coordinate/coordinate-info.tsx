@@ -47,18 +47,20 @@ const CoordinateGroup = styled.div`
 `
 
 export const CoordinateInfo = () => {
-  const { endPos, startPos, cursorPos } = useMarkCoordinate()
+  const { endPos, polygons, startPos, cursorPos } = useMarkCoordinate()
   const { status } = useStatusUpdate()
 
   const { pollingJobId, pollingError, pollingStatus } = useViewDamage()
 
   return (
+    // TODO: show the polygons, somehow ... but not like this:
+    // {polygons.map((p) => <CoordinateGroup>{polygons}</CoordinateGroup>)}
     <CoordinateInfoContainer>
       {!pollingError && pollingStatus && (
         <CoordinateGroup>{`${pollingJobId}: ${pollingStatus?.status}`}</CoordinateGroup>
       )}
       {status && <CoordinateGroup>{status}</CoordinateGroup>}
-      {endPos && (
+      {false && endPos && (
         <CoordinateGroup>
           <div>
             {endPos[1].toFixed(6)}
@@ -71,7 +73,7 @@ export const CoordinateInfo = () => {
           </h3>
         </CoordinateGroup>
       )}
-      {startPos && (
+      {false && startPos && (
         <CoordinateGroup>
           <div>
             {startPos[1].toFixed(6)}
